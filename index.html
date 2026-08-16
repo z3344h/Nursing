@@ -1,0 +1,5151 @@
+<!DOCTYPE html>
+		<html lang="ar" dir="rtl"
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#c88a9a">
+
+<title>مُمَرِّضَة مُمَهِّدَة 🤍✨</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+:root{
+    --bg:#f8fafc;
+    --surface:#ffffff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --primary:#c88a9a;
+    --primary-light:#f8e8ec;
+    --border:#e2e8f0;
+    --danger:#ef4444;
+    --danger-light:#fee2e2;
+    --shadow:0 4px 12px rgba(0,0,0,.06);
+    --gradient:linear-gradient(135deg,#c88a9a,#b87a8a);
+}
+
+.dark{
+    --bg:#0f172a;
+    --surface:#1e293b;
+    --text:#f1f5f9;
+    --muted:#94a3b8;
+    --primary:#d4a0b0;
+    --primary-light:#3d2530;
+    --border:#334155;
+    --danger:#f87171;
+    --danger-light:#450a0a;
+    --shadow:0 4px 12px rgba(0,0,0,.3);
+    --gradient:linear-gradient(135deg,#d4a0b0,#b87a8a);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Tajawal',sans-serif;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:90px;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.container{
+    max-width:650px;
+    margin:auto;
+    padding:16px;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+h1{
+    color:var(--primary);
+    font-size:22px;
+    font-weight:800;
+}
+
+.date-text{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:4px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.dash-card{
+    background:var(--gradient);
+    color:white;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+}
+
+.points-display{
+    font-size:32px;
+    font-weight:800;
+    margin:6px 0;
+}
+
+.progress-bg{
+    background:rgba(255,255,255,.3);
+    height:8px;
+    border-radius:5px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    background:white;
+    height:100%;
+    border-radius:5px;
+    transition:width .3s;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:16px;
+}
+
+.stat-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:13px;
+    text-align:center;
+    box-shadow:var(--shadow);
+}
+
+.stat-label{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.stat-value{
+    font-size:18px;
+    font-weight:800;
+    color:var(--primary);
+    margin-top:3px;
+}
+
+.card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
+}
+
+.comparison-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+}
+
+.btn{
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    border-radius:10px;
+    padding:9px 12px;
+    font-weight:700;
+}
+
+.btn-primary{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:white;
+}
+
+.btn-danger{
+    background:var(--danger);
+    border-color:var(--danger);
+    color:white;
+}
+
+.btn-light{
+    background:var(--bg);
+}
+
+.btn-icon{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:8px;
+    color:var(--text);
+}
+
+.action-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.nav-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:15px;
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+}
+
+.nav-card:hover{
+    border-color:var(--primary);
+}
+
+.nav-card-main{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.nav-card-icon{
+    font-size:26px;
+}
+
+.nav-card-title{
+    font-weight:800;
+}
+
+.nav-card-sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:3px;
+}
+
+.chevron{
+    color:var(--muted);
+    font-size:20px;
+}
+
+.tree-item{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:13px;
+    margin-bottom:9px;
+    box-shadow:var(--shadow);
+}
+
+.tree-main{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.tree-icon{
+    font-size:22px;
+    width:30px;
+    text-align:center;
+}
+
+.tree-info{
+    flex:1;
+    min-width:0;
+}
+
+.tree-name{
+    font-weight:800;
+}
+
+.tree-meta{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:3px;
+}
+
+.tree-actions{
+    display:flex;
+    gap:3px;
+}
+
+.mini{
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    padding:5px;
+}
+
+.mini:hover{
+    color:var(--primary);
+}
+
+.work-row{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    cursor:pointer;
+}
+
+.work-row .tree-info{
+    flex:1;
+}
+
+.check{
+    width:22px;
+    height:22px;
+    border:2px solid var(--border);
+    border-radius:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.check.done{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:white;
+}
+
+.work-points{
+    font-size:12px;
+    color:var(--primary);
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.deduction .work-points{
+    color:var(--danger);
+}
+
+.deduction .check.done{
+    background:var(--danger);
+    border-color:var(--danger);
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:35px 18px;
+}
+
+.empty-icon{
+    font-size:44px;
+    margin-bottom:10px;
+}
+
+.msg-card{
+    background:var(--primary-light);
+    border:1px solid var(--primary);
+    border-radius:16px;
+    padding:18px;
+    text-align:center;
+    margin-bottom:16px;
+}
+
+.chart-container{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:15px;
+    margin-bottom:16px;
+}
+
+.setting-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 0;
+    border-bottom:1px solid var(--border);
+    gap:12px;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--bg);
+    color:var(--text);
+    outline:none;
+}
+
+textarea{
+    min-height:200px;
+    resize:vertical;
+    line-height:1.9;
+}
+
+label{
+    font-size:13px;
+    color:var(--muted);
+    display:block;
+    margin-bottom:5px;
+}
+
+.field{
+    margin-bottom:12px;
+}
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.52);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:16px;
+}
+
+.modal-overlay.active{
+    display:flex;
+}
+
+.modal{
+    background:var(--surface);
+    width:100%;
+    max-width:480px;
+    max-height:90vh;
+    overflow:auto;
+    border-radius:17px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.2);
+}
+
+.modal h2{
+    color:var(--primary);
+    font-size:20px;
+    margin-bottom:15px;
+}
+
+.modal-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.modal-actions .btn{
+    flex:1;
+}
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-around;
+    padding:9px 0 18px;
+    z-index:50;
+    box-shadow:0 -3px 12px rgba(0,0,0,.05);
+}
+
+.nav-item{
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
+    cursor:pointer;
+    min-width:58px;
+}
+
+.nav-item.active{
+    color:var(--primary);
+    font-weight:800;
+}
+
+.nav-icon{
+    font-size:20px;
+    margin-bottom:2px;
+}
+
+.back-btn{
+    margin-bottom:12px;
+}
+
+.breadcrumb{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.reader-title{
+    font-size:22px;
+    text-align:center;
+    color:var(--primary);
+    margin-bottom:15px;
+}
+
+.reader-text{
+    font-size:17px;
+    line-height:2.25;
+    white-space:pre-wrap;
+    text-align:right;
+}
+
+.reader-done{
+    margin-top:18px;
+    padding:15px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+}
+
+.small-title{
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:10px;
+}
+
+.danger-note{
+    font-size:12px;
+    color:var(--danger);
+    line-height:1.5;
+}
+
+@media(max-width:420px){
+
+    .container{
+        padding:12px;
+    }
+
+    .points-display{
+        font-size:28px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<div>
+<h1>مُمَرِّضَة مُمَهِّدَة 🤍✨</h1>
+<div class="date-text" id="currentDate"></div>
+</div>
+
+</header>
+
+
+<!-- =========================
+     HOME
+========================= -->
+
+<section id="page-home" class="page active">
+
+<div class="dash-card">
+
+<div style="display:flex;justify-content:space-between;font-size:14px;opacity:.9">
+
+<span>صافي نقاط اليوم</span>
+
+<span id="percentageText">
+0% إنجاز
+</span>
+
+</div>
+
+<div class="points-display" id="totalPointsDisplay">
+0
+<span style="font-size:16px;font-weight:400">
+نقطة
+</span>
+</div>
+
+<div class="progress-bg">
+
+<div
+class="progress-fill"
+id="dailyProgress"
+style="width:0%">
+</div>
+
+</div>
+
+<div style="font-size:12px;margin-top:8px;opacity:.8">
+
+الهدف:
+<span id="goalDisplayHome">
+20,000
+</span>
+
+نقطة
+
+</div>
+
+</div>
+
+
+<div class="stats-grid">
+
+<div class="stat-box">
+
+<div class="stat-label">
+النقاط المكتسبة
+</div>
+
+<div
+class="stat-value"
+id="earnedStat">
+0
+</div>
+
+</div>
+
+
+<div
+class="stat-box"
+style="border-color:var(--danger)">
+
+<div class="stat-label">
+الخصومات
+</div>
+
+<div
+class="stat-value"
+id="deductedStat"
+style="color:var(--danger)">
+0
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="comparisonBox"
+class="comparison-box">
+</div>
+
+
+<div id="dailyMessageContainer">
+</div>
+
+
+<!-- QUICK ACCESS -->
+
+<div class="card">
+
+<div class="small-title">
+الوصول السريع ⚡
+</div>
+
+
+<!-- التعديل الأول:
+     تم الإبقاء على القسمين فقط -->
+
+<div
+class="nav-card"
+onclick="openWorkRoot('positive')">
+
+<div class="nav-card-main">
+
+<div class="nav-card-icon">
+🌸
+</div>
+
+<div>
+
+<div class="nav-card-title">
+أعمال تزيد النقاط
+</div>
+
+<div class="nav-card-sub">
+الأقسام والأعمال والأدعية
+</div>
+
+</div>
+
+</div>
+
+<span class="chevron">
+‹
+</span>
+
+</div>
+
+
+<div
+class="nav-card"
+onclick="openWorkRoot('negative')">
+
+<div class="nav-card-main">
+
+<div class="nav-card-icon">
+⚠️
+</div>
+
+<div>
+
+<div class="nav-card-title">
+أعمال تنقص النقاط
+</div>
+
+<div class="nav-card-sub">
+الخصومات والتصرفات السلبية
+</div>
+
+</div>
+
+</div>
+
+<span class="chevron">
+‹
+</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     ACTIVITIES
+========================= -->
+
+<section id="page-activities" class="page">
+
+<h2 class="section-title">
+الأعمال 📿
+</h2>
+
+<div id="activityView">
+</div>
+
+</section>
+
+
+<!-- =========================
+     PROGRESS
+========================= -->
+
+<section id="page-progress" class="page">
+
+<h2 class="section-title">
+تطوري 📈
+</h2>
+
+<div
+class="action-row"
+style="margin-bottom:12px">
+
+<button
+class="btn"
+onclick="updateChartRange(7)">
+آخر 7 أيام
+</button>
+
+<button
+class="btn"
+onclick="updateChartRange(30)">
+آخر 30 يوم
+</button>
+
+</div>
+
+
+<div class="chart-container">
+
+<canvas
+id="progressChart"
+height="210">
+</canvas>
+
+</div>
+
+
+<div
+id="progressStats"
+class="stats-grid">
+</div>
+
+</section>
+
+
+<!-- =========================
+     MESSAGES
+========================= -->
+
+<section id="page-messages" class="page">
+
+<div
+style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+
+<h2
+class="section-title"
+style="margin:0">
+رسائل 💌
+</h2>
+
+<button
+class="btn btn-primary"
+onclick="openMessageModal()">
++ إضافة
+</button>
+
+</div>
+
+
+<div id="messagesList">
+</div>
+
+</section>
+
+
+<!-- =========================
+     SETTINGS
+========================= -->
+
+<section id="page-settings" class="page">
+
+<h2 class="section-title">
+الإعدادات ⚙️
+</h2>
+
+
+<div class="card">
+
+<div class="setting-item">
+
+<div>
+
+<b>
+الوضع الليلي
+</b>
+
+<div
+class="small-title"
+style="margin:3px 0 0">
+تغيير مظهر الموقع
+</div>
+
+</div>
+
+
+<button
+class="btn-icon"
+onclick="toggleDarkMode()"
+id="darkModeBtn">
+🌙
+</button>
+
+</div>
+
+
+<div class="setting-item">
+
+<div>
+<b>
+الهدف اليومي
+</b>
+</div>
+
+<input
+type="number"
+id="goalInput"
+style="width:120px;text-align:center">
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3 style="margin-bottom:12px">
+إدارة أعمال النقاط
+</h3>
+
+<p class="small-title">
+
+يمكنك بناء شجرة ضخمة من الأقسام والأعمال.
+
+مثال:
+
+عبادات ← الصلاة ← النوافل
+
+</p>
+
+
+<div class="action-row">
+
+<button
+class="btn btn-primary"
+onclick="openNodeModal('positive',null,'category')">
++ قسم يزيد
+</button>
+
+
+<button
+class="btn btn-danger"
+onclick="openNodeModal('negative',null,'category')">
++ قسم ينقص
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3 style="margin-bottom:12px">
+إدارة الأدعية
+</h3>
+
+<p class="small-title">
+
+أضيفي أقسام الأدعية والأدعية والنصوص الطويلة كما تريدين.
+
+</p>
+
+<button
+class="btn btn-primary"
+onclick="openDuaCategoryModal()">
+
++ إضافة قسم أدعية
+
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h3 style="margin-bottom:12px">
+النسخ الاحتياطي 💾
+</h3>
+
+
+<button
+class="btn btn-primary"
+style="width:100%;margin-bottom:8px"
+onclick="exportBackup()">
+
+📥 تصدير نسخة احتياطية
+
+</button>
+
+
+<button
+class="btn"
+style="width:100%"
+onclick="document.getElementById('importFile').click()">
+
+📤 استيراد نسخة احتياطية
+
+</button>
+
+
+<input
+id="importFile"
+type="file"
+accept=".json"
+style="display:none"
+onchange="importBackup(event)">
+
+</div>
+
+
+<div class="card">
+
+<button
+class="btn btn-danger"
+style="width:100%"
+onclick="clearAllData()">
+
+🗑️ حذف جميع البيانات
+
+</button>
+
+<p
+class="danger-note"
+style="text-align:center;margin-top:7px">
+
+سيحذف كل الأقسام والأعمال والأدعية والسجلات.
+
+</p>
+
+</div>
+
+</section>
+
+</div>
+
+
+<!-- =========================
+     BOTTOM NAV
+========================= -->
+
+<nav class="bottom-nav">
+
+<div
+class="nav-item active"
+data-page="home"
+onclick="navigateTo('home',this)">
+
+<div class="nav-icon">
+🏠
+</div>
+
+الرئيسية
+
+</div>
+
+
+<div
+class="nav-item"
+data-page="activities"
+onclick="navigateTo('activities',this)">
+
+<div class="nav-icon">
+📿
+</div>
+
+الأعمال
+
+</div>
+
+
+<div
+class="nav-item"
+data-page="progress"
+onclick="navigateTo('progress',this)">
+
+<div class="nav-icon">
+📈
+</div>
+
+تطوري
+
+</div>
+
+
+<div
+class="nav-item"
+data-page="messages"
+onclick="navigateTo('messages',this)">
+
+<div class="nav-icon">
+💌
+</div>
+
+رسائل
+
+</div>
+
+
+<div
+class="nav-item"
+data-page="settings"
+onclick="navigateTo('settings',this)">
+
+<div class="nav-icon">
+⚙️
+</div>
+
+الإعدادات
+
+</div>
+
+</nav>
+
+
+<div
+class="modal-overlay"
+id="modalOverlay">
+
+<div
+class="modal"
+id="modalContent">
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const STORAGE_KEY = "muhasabaDataV4";
+
+let appData = loadData();
+
+let currentChartRange = 7;
+
+let chart = null;
+
+let activityState = {
+    view:"categories",
+    categoryId:null,
+    parentId:null,
+    duaCategoryId:null,
+    duaId:null
+};
+
+
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+function uid(prefix="id"){
+
+    return prefix +
+        "_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random().toString(36).slice(2,8);
+
+}
+
+
+function localDate(date){
+
+    const d = new Date(
+        date.getTime() -
+        date.getTimezoneOffset() * 60000
+    );
+
+    return d.toISOString().slice(0,10);
+
+}
+
+
+function today(){
+
+    return localDate(new Date());
+
+}
+
+
+function escapeHtml(value=""){
+
+    return String(value).replace(
+        /[&<>"']/g,
+        char => ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+        }[char])
+    );
+
+}
+
+
+/* =========================================================
+   DATA LOAD / SAVE
+========================================================= */
+
+function save(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(appData)
+    );
+
+}
+
+
+function createDefaultData(){
+
+    return {
+
+        version:4,
+
+        goal:20000,
+
+        positive:[
+            {
+                id:uid("cat"),
+                name:"عبادات",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"أسرة",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"أخلاق",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"صحة",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"عمل ودراسة",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"تطوير الذات",
+                type:"category",
+                children:[]
+            }
+        ],
+
+        negative:[
+            {
+                id:uid("cat"),
+                name:"تقصير في العبادات",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"أخلاق وسلوك",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"إضاعة الوقت",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"صحة",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("cat"),
+                name:"عمل ودراسة",
+                type:"category",
+                children:[]
+            }
+        ],
+
+        duaCategories:[
+            {
+                id:uid("duaCat"),
+                name:"أدعية يومية",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أدعية أسبوعية",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أدعية شهرية",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أدعية شهر رجب",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أدعية شهر شعبان",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أدعية شهر رمضان",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"زيارات",
+                type:"category",
+                children:[]
+            },
+            {
+                id:uid("duaCat"),
+                name:"أذكار",
+                type:"category",
+                children:[]
+            }
+        ],
+
+        messages:[],
+
+        logs:{}
+
+    };
+
+}
+
+
+function loadData(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(STORAGE_KEY);
+
+        if(saved){
+
+            const data = JSON.parse(saved);
+
+            migrateData(data);
+
+            return data;
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+    const data = createDefaultData();
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+    return data;
+
+}
+
+
+function migrateData(data){
+
+    data.version = 4;
+
+    if(!data.goal)
+        data.goal = 20000;
+
+    if(!Array.isArray(data.positive))
+        data.positive = [];
+
+    if(!Array.isArray(data.negative))
+        data.negative = [];
+
+    if(!Array.isArray(data.duaCategories))
+        data.duaCategories = [];
+
+    if(!Array.isArray(data.messages))
+        data.messages = [];
+
+    if(!data.logs)
+        data.logs = {};
+
+    Object.values(data.logs).forEach(log => {
+
+        if(!log.completed)
+            log.completed = {};
+
+    });
+
+}
+
+
+/* =========================================================
+   TREE HELPERS
+========================================================= */
+
+function findNode(list,id){
+
+    for(const node of list){
+
+        if(node.id === id)
+            return node;
+
+        const found =
+            findNode(
+                node.children || [],
+                id
+            );
+
+        if(found)
+            return found;
+
+    }
+
+    return null;
+
+}
+
+
+function findParent(list,id,parent=null){
+
+    for(const node of list){
+
+        if(node.id === id)
+            return parent;
+
+        const found =
+            findParent(
+                node.children || [],
+                id,
+                node
+            );
+
+        if(found !== null)
+            return found;
+
+    }
+
+    return null;
+
+}
+
+
+function allLeaves(list,result=[]){
+
+    for(const node of list){
+
+        if(node.type === "work")
+            result.push(node);
+
+        if(node.children)
+            allLeaves(node.children,result);
+
+    }
+
+    return result;
+
+}
+
+
+function allDuas(){
+
+    const result=[];
+
+    function walk(list,path=[]){
+
+        for(const item of list){
+
+            const currentPath =
+                [...path,item.name];
+
+            if(item.type === "dua"){
+
+                result.push({
+                    ...item,
+                    path:currentPath
+                });
+
+            }
+
+            if(item.children)
+                walk(item.children,currentPath);
+
+        }
+
+    }
+
+    walk(appData.duaCategories);
+
+    return result;
+
+}
+
+
+/* =========================================================
+   DAILY LOG
+========================================================= */
+
+function getLog(date=today()){
+
+    if(!appData.logs[date]){
+
+        appData.logs[date] = {
+            completed:{}
+        };
+
+    }
+
+    return appData.logs[date];
+
+}
+
+
+function isDone(id,date=today()){
+
+    return !!getLog(date).completed[id];
+
+}
+
+
+function setDone(id,value,date=today()){
+
+    getLog(date).completed[id] = value;
+
+    save();
+
+}
+
+
+/* =========================================================
+   POINT CALCULATIONS
+========================================================= */
+
+function totals(date=today()){
+
+    const log = getLog(date);
+
+    const positive =
+        allLeaves(appData.positive);
+
+    const negative =
+        allLeaves(appData.negative);
+
+    let earned = 0;
+
+    let deducted = 0;
+
+
+    positive.forEach(work => {
+
+        if(log.completed[work.id]){
+
+            earned += Number(work.points) || 0;
+
+        }
+
+    });
+
+
+    negative.forEach(work => {
+
+        if(log.completed[work.id]){
+
+            deducted += Number(work.points) || 0;
+
+        }
+
+    });
+
+
+    return {
+
+        earned,
+
+        deducted,
+
+        final:earned-deducted
+
+    };
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function navigateTo(page,element){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(pageElement =>
+            pageElement.classList.remove("active")
+        );
+
+
+    document
+        .getElementById("page-"+page)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".nav-item")
+        .forEach(item =>
+            item.classList.toggle(
+                "active",
+                item.dataset.page === page
+            )
+        );
+
+
+    if(page === "home")
+        renderHome();
+
+    if(page === "activities")
+        renderActivities();
+
+    if(page === "progress")
+        renderChart();
+
+    if(page === "messages")
+        renderMessages();
+
+    if(page === "settings")
+        loadSettings();
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function renderHome(){
+
+    const totalsToday = totals();
+
+    const percentage =
+        appData.goal > 0
+        ? Math.round(
+            totalsToday.final /
+            appData.goal *
+            100
+        )
+        : 0;
+
+
+    document.getElementById(
+        "currentDate"
+    ).textContent =
+        new Date().toLocaleDateString(
+            "ar-EG",
+            {
+                weekday:"long",
+                year:"numeric",
+                month:"long",
+                day:"numeric"
+            }
+        );
+
+
+    document.getElementById(
+        "totalPointsDisplay"
+    ).innerHTML =
+        `${totalsToday.final.toLocaleString("ar-EG")}
+        <span style="font-size:16px;font-weight:400">
+        نقطة
+        </span>`;
+
+
+    document.getElementById(
+        "percentageText"
+    ).textContent =
+        `${percentage}% إنجاز`;
+
+
+    document.getElementById(
+        "dailyProgress"
+    ).style.width =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                percentage
+            )
+        ) + "%";
+
+
+    document.getElementById(
+        "goalDisplayHome"
+    ).textContent =
+        Number(appData.goal)
+        .toLocaleString("ar-EG");
+
+
+    document.getElementById(
+        "earnedStat"
+    ).textContent =
+        totalsToday.earned
+        .toLocaleString("ar-EG");
+
+
+    document.getElementById(
+        "deductedStat"
+    ).textContent =
+        totalsToday.deducted
+        .toLocaleString("ar-EG");
+
+
+    const yesterday =
+        new Date();
+
+    yesterday.setDate(
+        yesterday.getDate()-1
+    );
+
+    const yesterdayString =
+        localDate(yesterday);
+
+    const yesterdayLog =
+        appData.logs[yesterdayString];
+
+
+    if(yesterdayLog){
+
+        const yesterdayTotals =
+            totals(yesterdayString);
+
+        const difference =
+            totalsToday.final -
+            yesterdayTotals.final;
+
+
+        let status =
+            "بقي كما هو";
+
+        let color =
+            "var(--muted)";
+
+        if(difference > 0){
+
+            status =
+                "ارتفع عن الأمس";
+
+            color =
+                "var(--primary)";
+
+        }
+
+        if(difference < 0){
+
+            status =
+                "انخفض عن الأمس";
+
+            color =
+                "var(--danger)";
+
+        }
+
+
+        document.getElementById(
+            "comparisonBox"
+        ).innerHTML = `
+
+        <div style="
+        display:flex;
+        justify-content:space-between;
+        font-weight:800;
+        margin-bottom:8px">
+
+            <span>
+                مقارنة بالأمس
+            </span>
+
+            <span style="
+            font-size:12px;
+            color:${color}">
+
+                ${status}
+
+            </span>
+
+        </div>
+
+
+        <div style="
+        display:flex;
+        justify-content:space-between;
+        color:var(--muted);
+        font-size:13px">
+
+            <span>
+                نقاط الأمس:
+                <b style="color:var(--text)">
+                ${yesterdayTotals.final.toLocaleString("ar-EG")}
+                </b>
+            </span>
+
+
+            <span>
+                اليوم:
+                <b style="color:var(--text)">
+                ${totalsToday.final.toLocaleString("ar-EG")}
+                </b>
+            </span>
+
+        </div>
+
+
+        <div style="
+        text-align:center;
+        color:${color};
+        font-size:18px;
+        font-weight:800;
+        margin-top:8px">
+
+            ${difference > 0 ? "+" : ""}
+            ${difference.toLocaleString("ar-EG")}
+            نقطة
+            ${difference > 0 ? "📈" : difference < 0 ? "📉" : "↔️"}
+
+        </div>
+
+        `;
+
+    }else{
+
+        document.getElementById(
+            "comparisonBox"
+        ).innerHTML = `
+
+        <div style="
+        text-align:center;
+        color:var(--muted);
+        font-size:13px">
+
+            لا توجد بيانات لليوم السابق للمقارنة.
+
+        </div>
+
+        `;
+
+    }
+
+
+    renderDailyMessage();
+
+}
+
+
+function renderDailyMessage(){
+
+    const container =
+        document.getElementById(
+            "dailyMessageContainer"
+        );
+
+
+    if(!appData.messages.length){
+
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+
+    const start =
+        new Date(2024,0,1);
+
+    const days =
+        Math.floor(
+            (new Date()-start) /
+            86400000
+        );
+
+
+    const index =
+        days %
+        appData.messages.length;
+
+
+    const message =
+        appData.messages[index];
+
+
+    container.innerHTML = `
+
+    <div class="msg-card">
+
+        <div style="font-size:26px">
+            💌
+        </div>
+
+        <div style="
+        font-weight:800;
+        color:var(--primary);
+        margin:5px">
+
+            رسالة اليوم
+
+        </div>
+
+        <div style="line-height:1.7">
+
+            "${escapeHtml(message.text)}"
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   ACTIVITIES PAGE
+========================================================= */
+
+/*
+   التعديل الثاني:
+   صفحة "الأعمال" أصبحت صفحة مستقلة وفارغة
+   عند الدخول إليها، وتحتوي فقط على خيارين:
+   + قسم
+   + دعاء
+
+   الأقسام والأدعية المضافة هنا تعتبر ضمن
+   الأعمال التي تزيد النقاط.
+*/
+
+function renderActivities(){
+
+    const container =
+        document.getElementById(
+            "activityView"
+        );
+
+
+    if(activityState.view === "categories"){
+
+        renderActivityRoot(container);
+
+        return;
+
+    }
+
+
+    if(activityState.view === "workCategories"){
+
+        renderWorkBrowser(
+            container,
+            activityState.categoryId,
+            null
+        );
+
+        return;
+
+    }
+
+
+    if(activityState.view === "workFolder"){
+
+        renderWorkBrowser(
+            container,
+            activityState.categoryId,
+            activityState.parentId
+        );
+
+        return;
+
+    }
+
+
+    if(activityState.view === "duaCategories"){
+
+        renderDuaCategories(container);
+
+        return;
+
+    }
+
+
+    if(activityState.view === "duaList"){
+
+        renderDuaList(container);
+
+        return;
+
+    }
+
+
+    if(activityState.view === "duaReader"){
+
+        renderDuaReader(container);
+
+        return;
+
+    }
+
+}
+
+
+/*
+   صفحة الأعمال الرئيسية:
+   فارغة من المحتوى الافتراضي الذي كان يعرض
+   "الأدعية والأعمال" و"أعمال تزيد" و"أعمال تنقص".
+
+   الآن المستخدم هو من يبدأ بإضافة قسم أو دعاء.
+*/
+
+function renderActivityRoot(container){
+
+    container.innerHTML = `
+
+    <div class="card" style="text-align:center">
+
+        <div
+        style="
+        font-size:48px;
+        margin-bottom:10px">
+
+            📿
+
+        </div>
+
+        <div
+        style="
+        font-size:20px;
+        font-weight:800;
+        color:var(--primary);
+        margin-bottom:6px">
+
+            أعمالي
+
+        </div>
+
+        <div
+        style="
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.8;
+        margin-bottom:18px">
+
+            هذه الصفحة لكِ لبناء أعمالك.
+            <br>
+            أضيفي قسمًا أو دعاءً كما تريدين.
+
+        </div>
+
+
+        <div
+        class="action-row"
+        style="
+        justify-content:center;
+        margin-bottom:4px">
+
+            <button
+            class="btn btn-primary"
+            onclick="
+                openNodeModal(
+                    'positive',
+                    null,
+                    'category'
+                )
+            ">
+
+                + إضافة قسم
+
+            </button>
+
+
+            <button
+            class="btn"
+            onclick="
+                openDuaModal(
+                    null,
+                    null
+                )
+            ">
+
+                + إضافة دعاء
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!--
+        إذا كانت هناك بيانات موجودة مسبقًا،
+        نعرضها أسفل الصفحة فقط.
+        لا نغيّر البيانات القديمة.
+    -->
+
+    ${
+        appData.positive.length ||
+        appData.duaCategories.length
+        ? `
+
+        <div
+        class="small-title"
+        style="margin-top:18px">
+
+            العناصر المضافة
+
+        </div>
+
+        ${renderExistingPositiveContent()}
+
+        `
+        : ""
+    }
+
+    `;
+
+}
+
+
+/*
+   عرض العناصر الإيجابية الموجودة مسبقًا
+   بدون تغيير طريقة عملها.
+*/
+
+function renderExistingPositiveContent(){
+
+    let html = "";
+
+
+    appData.positive.forEach(node => {
+
+        html += renderPositiveRootNode(node);
+
+    });
+
+
+    appData.duaCategories.forEach(category => {
+
+        html += `
+
+        <div
+        class="nav-card"
+        onclick="
+            activityState.view='duaList';
+            activityState.duaCategoryId='${category.id}';
+            renderActivities();
+        ">
+
+            <div class="nav-card-main">
+
+                <div class="nav-card-icon">
+                    📿
+                </div>
+
+                <div>
+
+                    <div class="nav-card-title">
+
+                        ${escapeHtml(category.name)}
+
+                    </div>
+
+                    <div class="nav-card-sub">
+
+                        قسم أدعية —
+                        ${
+                            (category.children || []).length
+                        }
+                        عنصر
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <span class="chevron">
+                ‹
+            </span>
+
+        </div>
+
+        `;
+
+    });
+
+
+    return html;
+
+}
+
+
+function renderPositiveRootNode(node){
+
+    const count =
+        (node.children || []).length;
+
+
+    if(node.type === "category"){
+
+        return `
+
+        <div
+        class="nav-card"
+        onclick="
+            activityState.view='workFolder';
+            activityState.categoryId='positive';
+            activityState.parentId='${node.id}';
+            renderActivities();
+        ">
+
+            <div class="nav-card-main">
+
+                <div class="nav-card-icon">
+                    📁
+                </div>
+
+                <div>
+
+                    <div class="nav-card-title">
+                        ${escapeHtml(node.name)}
+                    </div>
+
+                    <div class="nav-card-sub">
+                        ${count} عنصر
+                    </div>
+
+                </div>
+
+            </div>
+
+            <span class="chevron">
+                ‹
+            </span>
+
+        </div>
+
+        `;
+
+    }
+
+
+    const done =
+        isDone(node.id);
+
+
+    return `
+
+    <div class="tree-item">
+
+        <div
+        class="work-row"
+        onclick="
+            toggleWork('${node.id}')
+        ">
+
+            <div
+            class="check
+            ${done ? "done" : ""}">
+
+                ${done ? "✓" : ""}
+
+            </div>
+
+
+            <div class="tree-info">
+
+                <div class="tree-name">
+
+                    ${escapeHtml(node.name)}
+
+                </div>
+
+            </div>
+
+
+            <div class="work-points">
+
+                +
+                ${Number(node.points)
+                .toLocaleString("ar-EG")}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   WORK TREE
+========================================================= */
+
+function openWorkRoot(type){
+
+    activityState = {
+
+        view:"workCategories",
+
+        categoryId:type,
+
+        parentId:null,
+
+        duaCategoryId:null,
+
+        duaId:null
+
+    };
+
+    navigateTo("activities");
+
+}
+
+
+function renderWorkBrowser(
+    container,
+    type,
+    parentId
+){
+
+    const list =
+        type === "positive"
+        ? appData.positive
+        : appData.negative;
+
+
+    const parent =
+        parentId
+        ? findNode(list,parentId)
+        : null;
+
+
+    const children =
+        parent
+        ? parent.children || []
+        : list;
+
+
+    let html = `
+
+    <button
+    class="btn back-btn"
+    onclick="backActivity()">
+
+        → رجوع
+
+    </button>
+
+
+    <div class="breadcrumb">
+
+        <span>
+            ${
+                type === "positive"
+                ? "أعمال تزيد النقاط"
+                : "أعمال تنقص النقاط"
+            }
+        </span>
+
+        ${
+            parent
+            ? `
+            <span>‹</span>
+            <b>
+                ${escapeHtml(parent.name)}
+            </b>
+            `
+            : ""
+        }
+
+    </div>
+
+
+    <div
+    class="action-row"
+    style="margin-bottom:12px">
+
+        <button
+        class="btn btn-primary"
+        onclick="
+            openNodeModal(
+                '${type}',
+                '${parentId || ""}',
+                'category'
+            )
+        ">
+
+            + قسم
+
+        </button>
+
+
+        <button
+        class="btn"
+        onclick="
+            openNodeModal(
+                '${type}',
+                '${parentId || ""}',
+                'work'
+            )
+        ">
+
+            + عمل
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    if(!children.length){
+
+        html += `
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                🌱
+            </div>
+
+            <div>
+
+                لا توجد عناصر هنا بعد.
+
+                <br>
+
+                أضيفي قسمًا أو عملاً للبدء.
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+
+    children.forEach(node => {
+
+        const count =
+            (node.children || []).length;
+
+
+        if(node.type === "category"){
+
+            html += `
+
+            <div
+            class="tree-item"
+            onclick="
+                activityState.view='workFolder';
+                activityState.categoryId='${type}';
+                activityState.parentId='${node.id}';
+                renderActivities();
+            ">
+
+                <div class="tree-main">
+
+                    <div class="tree-icon">
+                        📁
+                    </div>
+
+                    <div class="tree-info">
+
+                        <div class="tree-name">
+                            ${escapeHtml(node.name)}
+                        </div>
+
+                        <div class="tree-meta">
+                            ${count} عنصر
+                        </div>
+
+                    </div>
+
+
+                    <div class="tree-actions">
+
+                        <button
+                        class="mini"
+                        onclick="
+                            event.stopPropagation();
+                            openNodeModal(
+                                '${type}',
+                                '${node.id}',
+                                'category',
+                                '${node.id}'
+                            )
+                        ">
+
+                            ✏️
+
+                        </button>
+
+
+                        <button
+                        class="mini"
+                        onclick="
+                            event.stopPropagation();
+                            deleteNode(
+                                '${type}',
+                                '${node.id}'
+                            )
+                        ">
+
+                            🗑️
+
+                        </button>
+
+                    </div>
+
+
+                    <span class="chevron">
+                        ‹
+                    </span>
+
+                </div>
+
+            </div>
+
+            `;
+
+        }
+
+        else{
+
+            const done =
+                isDone(node.id);
+
+
+            html += `
+
+            <div
+            class="tree-item
+            ${type === "negative" ? "deduction" : ""}">
+
+                <div
+                class="work-row"
+                onclick="
+                    toggleWork('${node.id}')
+                ">
+
+
+                    <div
+                    class="check
+                    ${done ? "done" : ""}">
+
+                        ${done ? "✓" : ""}
+
+                    </div>
+
+
+                    <div class="tree-info">
+
+                        <div
+                        class="tree-name"
+                        style="
+                        ${
+                            done
+                            ? "text-decoration:line-through;color:var(--muted)"
+                            : ""
+                        }">
+
+                            ${escapeHtml(node.name)}
+
+                        </div>
+
+
+                        <div class="tree-meta">
+
+                            ${
+                                node.linkedDuaId
+                                ? "🔗 مرتبط بدعاء"
+                                : ""
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="work-points">
+
+                        ${
+                            type === "negative"
+                            ? "-"
+                            : "+"
+                        }
+
+                        ${Number(node.points)
+                        .toLocaleString("ar-EG")}
+
+                    </div>
+
+
+                    <div class="tree-actions">
+
+                        <button
+                        class="mini"
+                        onclick="
+                            event.stopPropagation();
+
+                            openNodeModal(
+                                '${type}',
+                                '${parentId || ""}',
+                                'work',
+                                '${node.id}'
+                            )
+                        ">
+
+                            ✏️
+
+                        </button>
+
+
+                        <button
+                        class="mini"
+                        onclick="
+                            event.stopPropagation();
+
+                            deleteNode(
+                                '${type}',
+                                '${node.id}'
+                            )
+                        ">
+
+                            🗑️
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            `;
+
+        }
+
+    });
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+function backActivity(){
+
+    if(activityState.view === "duaReader"){
+
+        activityState.view = "duaList";
+
+    }
+
+    else if(activityState.view === "duaList"){
+
+        activityState.view = "duaCategories";
+
+    }
+
+    else if(activityState.view === "duaCategories"){
+
+        activityState.view = "categories";
+
+    }
+
+    else if(activityState.view === "workFolder"){
+
+        activityState.view = "workCategories";
+
+        activityState.parentId = null;
+
+    }
+
+    else if(activityState.view === "workCategories"){
+
+        activityState.view = "categories";
+
+    }
+
+    else{
+
+        activityState.view = "categories";
+
+    }
+
+
+    renderActivities();
+
+}
+
+
+/* =========================================================
+   WORK TOGGLE + DUA LINK
+========================================================= */
+
+function toggleWork(id){
+
+    const positive =
+        findNode(
+            appData.positive,
+            id
+        );
+
+
+    const negative =
+        findNode(
+            appData.negative,
+            id
+        );
+
+
+    const work =
+        positive || negative;
+
+
+    if(!work)
+        return;
+
+
+    const newValue =
+        !isDone(id);
+
+
+    setDone(
+        id,
+        newValue
+    );
+
+
+    if(work.linkedDuaId){
+
+        getLog().completed[
+            work.linkedDuaId
+        ] = newValue;
+
+    }
+
+
+    save();
+
+    renderActivities();
+
+    renderHome();
+
+}
+
+
+/* =========================================================
+   WORK MODAL
+========================================================= */
+
+function openNodeModal(
+    type,
+    parentId,
+    nodeType,
+    editId=null
+){
+
+    const list =
+        type === "positive"
+        ? appData.positive
+        : appData.negative;
+
+
+    const existing =
+        editId
+        ? findNode(list,editId)
+        : null;
+
+
+    const isWork =
+        nodeType === "work";
+
+
+    const duaOptions =
+        allDuas();
+
+
+    let duaOptionsHtml = "";
+
+
+    if(isWork){
+
+        duaOptionsHtml = `
+
+        <div class="field">
+
+            <label>
+                ربط هذا العمل بدعاء
+            </label>
+
+            <select id="nodeDua">
+
+                <option value="">
+                    بدون ربط
+                </option>
+
+                ${
+                    duaOptions.map(
+                        dua => `
+                        <option
+                        value="${dua.id}"
+                        ${
+                            existing &&
+                            existing.linkedDuaId === dua.id
+                            ? "selected"
+                            : ""
+                        }>
+
+                            ${escapeHtml(
+                                dua.path.join(" / ")
+                            )}
+
+                        </option>
+                        `
+                    ).join("")
+                }
+
+            </select>
+
+        </div>
+
+        `;
+
+    }
+
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = `
+
+    <h2>
+
+        ${
+            existing
+            ? "تعديل"
+            : "إضافة"
+        }
+
+        ${isWork ? "عمل" : "قسم"}
+
+    </h2>
+
+
+    <div class="field">
+
+        <label>
+            الاسم
+        </label>
+
+        <input
+        id="nodeName"
+        value="${
+            existing
+            ? escapeHtml(existing.name)
+            : ""
+        }"
+        placeholder="${
+            isWork
+            ? "مثل: زيارة آل ياسين"
+            : "مثل: عبادات"
+        }">
+
+    </div>
+
+
+    ${
+        isWork
+        ? `
+
+        <div class="field">
+
+            <label>
+                النقاط
+            </label>
+
+            <input
+            id="nodePoints"
+            type="number"
+            min="0"
+            value="${
+                existing
+                ? existing.points
+                : ""
+            }"
+            placeholder="100">
+
+        </div>
+
+        ${duaOptionsHtml}
+
+        `
+        : ""
+    }
+
+
+    <div class="modal-actions">
+
+        <button
+        class="btn btn-primary"
+        onclick="
+            saveNode(
+                '${type}',
+                '${parentId || ""}',
+                '${nodeType}',
+                '${editId || ""}'
+            )
+        ">
+
+            حفظ
+
+        </button>
+
+
+        <button
+        class="btn"
+        onclick="closeModal()">
+
+            إلغاء
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    showModal();
+
+}
+
+
+/* =========================================================
+   SAVE WORK / CATEGORY
+========================================================= */
+
+function saveNode(
+    type,
+    parentId,
+    nodeType,
+    editId
+){
+
+    const list =
+        type === "positive"
+        ? appData.positive
+        : appData.negative;
+
+
+    const name =
+        document
+        .getElementById("nodeName")
+        .value
+        .trim();
+
+
+    if(!name){
+
+        alert("اكتبي الاسم");
+
+        return;
+
+    }
+
+
+    let node =
+        editId
+        ? findNode(list,editId)
+        : null;
+
+
+    if(node){
+
+        node.name = name;
+
+
+        if(nodeType === "work"){
+
+            node.points =
+                Number(
+                    document
+                    .getElementById("nodePoints")
+                    .value
+                ) || 0;
+
+
+            node.linkedDuaId =
+                document
+                .getElementById("nodeDua")
+                .value
+                || null;
+
+        }
+
+    }
+
+    else{
+
+        node = {
+
+            id:uid(
+                nodeType === "work"
+                ? "work"
+                : "cat"
+            ),
+
+            name:name,
+
+            type:nodeType,
+
+            children:[]
+
+        };
+
+
+        if(nodeType === "work"){
+
+            node.points =
+                Number(
+                    document
+                    .getElementById("nodePoints")
+                    .value
+                ) || 0;
+
+
+            node.linkedDuaId =
+                document
+                .getElementById("nodeDua")
+                .value
+                || null;
+
+        }
+
+
+        const parent =
+            parentId
+            ? findNode(
+                list,
+                parentId
+            )
+            : null;
+
+
+        if(parent){
+
+            if(!parent.children)
+                parent.children=[];
+
+            parent.children.push(node);
+
+        }
+
+        else{
+
+            list.push(node);
+
+        }
+
+    }
+
+
+    save();
+
+    closeModal();
+
+    renderActivities();
+
+    renderHome();
+
+}
+
+
+/* =========================================================
+   DELETE NODE
+========================================================= */
+
+function deleteNode(type,id){
+
+    if(!confirm(
+        "حذف هذا العنصر وكل ما تحته؟"
+    ))
+        return;
+
+
+    const list =
+        type === "positive"
+        ? appData.positive
+        : appData.negative;
+
+
+    const parent =
+        findParent(
+            list,
+            id
+        );
+
+
+    if(parent){
+
+        parent.children =
+            parent.children.filter(
+                item => item.id !== id
+            );
+
+    }
+
+    else{
+
+        const index =
+            list.findIndex(
+                item => item.id === id
+            );
+
+
+        if(index >= 0)
+            list.splice(index,1);
+
+    }
+
+
+    save();
+
+    renderActivities();
+
+    renderHome();
+
+}
+
+
+/* =========================================================
+   DUA CATEGORIES
+========================================================= */
+
+function renderDuaCategories(container){
+
+    let html = `
+
+    <button
+    class="btn back-btn"
+    onclick="
+        activityState.view='categories';
+        renderActivities();
+    ">
+
+        → رجوع
+
+    </button>
+
+
+    <div class="small-title">
+
+        اختاري نوع الأدعية
+
+    </div>
+
+
+    <div
+    class="action-row"
+    style="margin-bottom:12px">
+
+        <button
+        class="btn btn-primary"
+        onclick="openDuaCategoryModal()">
+
+            + إضافة قسم
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    if(!appData.duaCategories.length){
+
+        html += `
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                📿
+            </div>
+
+            <div>
+
+                لا توجد أقسام أدعية بعد.
+
+                <br>
+
+                يمكنك إضافة:
+
+                <br>
+
+                أدعية يومية، أسبوعية، شهرية،
+                رجب، رمضان، زيارات وغيرها.
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+
+    appData.duaCategories.forEach(category => {
+
+        html += `
+
+        <div
+        class="nav-card"
+        onclick="
+            activityState.view='duaList';
+            activityState.duaCategoryId='${category.id}';
+            renderActivities();
+        ">
+
+            <div class="nav-card-main">
+
+                <div class="nav-card-icon">
+                    📁
+                </div>
+
+                <div>
+
+                    <div class="nav-card-title">
+
+                        ${escapeHtml(category.name)}
+
+                    </div>
+
+                    <div class="nav-card-sub">
+
+                        ${
+                            (category.children || [])
+                            .length
+                        }
+
+                        عنصر
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <button
+                class="mini"
+                onclick="
+                    event.stopPropagation();
+
+                    openDuaCategoryModal(
+                        '${category.id}'
+                    )
+                ">
+
+                    ✏️
+
+                </button>
+
+
+                <button
+                class="mini"
+                onclick="
+                    event.stopPropagation();
+
+                    deleteDuaCategory(
+                        '${category.id}'
+                    )
+                ">
+
+                    🗑️
+
+                </button>
+
+
+                <span class="chevron">
+                    ‹
+                </span>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =========================================================
+   DUA CATEGORY MODAL
+========================================================= */
+
+function openDuaCategoryModal(id=null){
+
+    const existing =
+        id
+        ? findNode(
+            appData.duaCategories,
+            id
+        )
+        : null;
+
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = `
+
+    <h2>
+
+        ${
+            existing
+            ? "تعديل قسم الأدعية"
+            : "إضافة قسم أدعية"
+        }
+
+    </h2>
+
+
+    <div class="field">
+
+        <label>
+            اسم القسم
+        </label>
+
+        <input
+        id="duaCatName"
+        value="${
+            existing
+            ? escapeHtml(existing.name)
+            : ""
+        }"
+        placeholder="مثل: أدعية يومية">
+
+    </div>
+
+
+    <div class="modal-actions">
+
+        <button
+        class="btn btn-primary"
+        onclick="
+            saveDuaCategory(
+                '${id || ""}'
+            )
+        ">
+
+            حفظ
+
+        </button>
+
+
+        <button
+        class="btn"
+        onclick="closeModal()">
+
+            إلغاء
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    showModal();
+
+}
+
+
+function saveDuaCategory(id){
+
+    const name =
+        document
+        .getElementById("duaCatName")
+        .value
+        .trim();
+
+
+    if(!name){
+
+        alert("اكتبي اسم القسم");
+
+        return;
+
+    }
+
+
+    if(id){
+
+        const category =
+            findNode(
+                appData.duaCategories,
+                id
+            );
+
+        category.name = name;
+
+    }
+
+    else{
+
+        appData.duaCategories.push({
+
+            id:uid("duaCat"),
+
+            name:name,
+
+            type:"category",
+
+            children:[]
+
+        });
+
+    }
+
+
+    save();
+
+    closeModal();
+
+    renderActivities();
+
+}
+
+
+function deleteDuaCategory(id){
+
+    if(!confirm(
+        "حذف قسم الأدعية وكل ما بداخله؟"
+    ))
+        return;
+
+
+    appData.duaCategories =
+        appData.duaCategories.filter(
+            item => item.id !== id
+        );
+
+
+    save();
+
+    renderActivities();
+
+}
+
+
+/* =========================================================
+   DUA LIST
+========================================================= */
+
+function renderDuaList(container){
+
+    const category =
+        findNode(
+            appData.duaCategories,
+            activityState.duaCategoryId
+        );
+
+
+    if(!category){
+
+        activityState.view =
+            "duaCategories";
+
+        renderActivities();
+
+        return;
+
+    }
+
+
+    const list =
+        category.children || [];
+
+
+    let html = `
+
+    <button
+    class="btn back-btn"
+    onclick="
+        activityState.view='duaCategories';
+        renderActivities();
+    ">
+
+        → رجوع
+
+    </button>
+
+
+    <div class="breadcrumb">
+
+        <b>
+            ${escapeHtml(category.name)}
+        </b>
+
+    </div>
+
+
+    <button
+    class="btn btn-primary"
+    style="margin-bottom:12px"
+    onclick="
+        openDuaModal(
+            '${category.id}'
+        )
+    ">
+
+        + إضافة دعاء
+
+    </button>
+
+    `;
+
+
+    if(!list.length){
+
+        html += `
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                🤍
+            </div>
+
+            <div>
+
+                لا توجد أدعية في هذا القسم بعد.
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+
+    list.forEach(dua => {
+
+        const done =
+            isDone(dua.id);
+
+
+        html += `
+
+        <div class="tree-item">
+
+            <div
+            class="work-row"
+            onclick="
+                activityState.view='duaReader';
+                activityState.duaId='${dua.id}';
+                renderActivities();
+            ">
+
+
+                <div
+                class="check
+                ${done ? "done" : ""}">
+
+                    ${done ? "✓" : ""}
+
+                </div>
+
+
+                <div class="tree-info">
+
+                    <div class="tree-name">
+
+                        ${escapeHtml(dua.name)}
+
+                    </div>
+
+
+                    <div class="tree-meta">
+
+                        ${
+                            dua.text
+                            ? dua.text.length.toLocaleString("ar-EG") +
+                              " حرف"
+                            : "بدون نص بعد"
+                        }
+
+                        ${dua.linkedWorkId ? " 🔗 مرتبط" : ""}
+
+                    </div>
+
+                </div>
+
+
+                <div class="tree-actions">
+
+                    <button
+                    class="mini"
+                    onclick="
+                        event.stopPropagation();
+
+                        openDuaModal(
+                            '${category.id}',
+                            '${dua.id}'
+                        )
+                    ">
+
+                        ✏️
+
+                    </button>
+
+
+                    <button
+                    class="mini"
+                    onclick="
+                        event.stopPropagation();
+
+                        deleteDua(
+                            '${category.id}',
+                            '${dua.id}'
+                        )
+                    ">
+
+                        🗑️
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =========================================================
+   DUA READER
+========================================================= */
+
+function renderDuaReader(container){
+
+    const category =
+        findNode(
+            appData.duaCategories,
+            activityState.duaCategoryId
+        );
+
+
+    if(!category)
+        return;
+
+
+    const dua =
+        category.children.find(
+            item =>
+                item.id ===
+                activityState.duaId
+        );
+
+
+    if(!dua)
+        return;
+
+
+    const done =
+        isDone(dua.id);
+
+
+    container.innerHTML = `
+
+    <button
+    class="btn back-btn"
+    onclick="
+        activityState.view='duaList';
+        renderActivities();
+    ">
+
+        → رجوع للقائمة
+
+    </button>
+
+
+    <div class="card">
+
+        <div class="reader-title">
+
+            ${escapeHtml(dua.name)}
+
+        </div>
+
+
+        ${
+            dua.description
+            ? `
+            <div
+            class="small-title"
+            style="text-align:center">
+
+                ${escapeHtml(
+                    dua.description
+                )}
+
+            </div>
+            `
+            : ""
+        }
+
+
+        <div class="reader-text">
+
+            ${
+                escapeHtml(
+                    dua.text ||
+                    "لا يوجد نص بعد. يمكنك تعديل الدعاء وإضافة النص الكامل."
+                )
+            }
+
+        </div>
+
+
+        <div
+        class="reader-done"
+        onclick="
+            toggleDua(
+                '${dua.id}'
+            )
+        ">
+
+
+            <div
+            class="check
+            ${done ? "done" : ""}">
+
+                ${done ? "✓" : ""}
+
+            </div>
+
+
+            <b>
+
+                ${
+                    done
+                    ? "تم إتمام القراءة"
+                    : "إتمام القراءة"
+                }
+
+            </b>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   DUA TOGGLE
+========================================================= */
+
+function toggleDua(id){
+
+    const dua =
+        allDuas().find(
+            item => item.id === id
+        );
+
+
+    if(!dua)
+        return;
+
+
+    const newValue =
+        !isDone(id);
+
+
+    setDone(
+        id,
+        newValue
+    );
+
+
+    if(dua.linkedWorkId){
+
+        getLog().completed[
+            dua.linkedWorkId
+        ] = newValue;
+
+    }
+
+
+    save();
+
+    renderActivities();
+
+    renderHome();
+
+}
+
+
+/* =========================================================
+   DUA MODAL
+========================================================= */
+
+function openDuaModal(
+    categoryId,
+    id=null
+){
+
+    /*
+       عند الإضافة من صفحة الأعمال الرئيسية:
+       لا يوجد قسم أدعية محدد بعد.
+       نعرض اختيار القسم أولًا داخل نفس النافذة.
+    */
+
+    if(!categoryId){
+
+        const categories =
+            appData.duaCategories;
+
+
+        document.getElementById(
+            "modalContent"
+        ).innerHTML = `
+
+        <h2>
+            إضافة دعاء 📿
+        </h2>
+
+
+        ${
+            categories.length
+            ? `
+
+            <div class="field">
+
+                <label>
+                    اختاري قسم الدعاء
+                </label>
+
+                <select id="newDuaCategory">
+
+                    ${
+                        categories.map(
+                            category => `
+                            <option value="${category.id}">
+                                ${escapeHtml(category.name)}
+                            </option>
+                            `
+                        ).join("")
+                    }
+
+                </select>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                class="btn btn-primary"
+                onclick="
+                    const categoryId =
+                        document.getElementById(
+                            'newDuaCategory'
+                        ).value;
+
+                    closeModal();
+
+                    setTimeout(
+                        () => openDuaModal(categoryId),
+                        50
+                    );
+                ">
+
+                    التالي
+
+                </button>
+
+
+                <button
+                class="btn"
+                onclick="closeModal()">
+
+                    إلغاء
+
+                </button>
+
+            </div>
+
+            `
+            : `
+
+            <div class="empty" style="padding:20px">
+
+                <div class="empty-icon">
+                    📁
+                </div>
+
+                <div>
+                    لا توجد أقسام أدعية بعد.
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                class="btn btn-primary"
+                onclick="
+                    closeModal();
+                    setTimeout(
+                        () => openDuaCategoryModal(),
+                        50
+                    );
+                ">
+
+                    + إنشاء قسم
+
+                </button>
+
+
+                <button
+                class="btn"
+                onclick="closeModal()">
+
+                    إلغاء
+
+                </button>
+
+            </div>
+
+            `
+        }
+
+        `;
+
+
+        showModal();
+
+        return;
+
+    }
+
+
+    const category =
+        findNode(
+            appData.duaCategories,
+            categoryId
+        );
+
+
+    if(!category)
+        return;
+
+
+    const existing =
+        id
+        ? category.children.find(
+            item => item.id === id
+        )
+        : null;
+
+
+    const works =
+        allLeaves(
+            appData.positive
+        );
+
+
+    const workOptions =
+        works.map(
+            work => `
+
+            <option
+            value="${work.id}"
+            ${
+                existing &&
+                existing.linkedWorkId === work.id
+                ? "selected"
+                : ""
+            }>
+
+                ${escapeHtml(work.name)}
+
+                (+${Number(work.points)
+                .toLocaleString("ar-EG")})
+
+            </option>
+
+            `
+        ).join("");
+
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = `
+
+    <h2>
+
+        ${
+            existing
+            ? "تعديل الدعاء"
+            : "إضافة دعاء"
+        }
+
+    </h2>
+
+
+    <div class="field">
+
+        <label>
+            اسم الدعاء / الزيارة
+        </label>
+
+        <input
+        id="duaName"
+        value="${
+            existing
+            ? escapeHtml(existing.name)
+            : ""
+        }"
+        placeholder="مثل: زيارة آل ياسين">
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            وصف مختصر - اختياري
+        </label>
+
+        <input
+        id="duaDescription"
+        value="${
+            existing
+            ? escapeHtml(
+                existing.description || ""
+            )
+            : ""
+        }"
+        placeholder="دعاء يومي...">
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            النص الكامل
+        </label>
+
+        <textarea
+        id="duaText"
+        placeholder="ضعي النص الكامل هنا...">${
+            existing
+            ? escapeHtml(
+                existing.text || ""
+            )
+            : ""
+        }</textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            ربط الدعاء بعمل يزيد النقاط
+        </label>
+
+        <select id="duaWork">
+
+            <option value="">
+                بدون ربط
+            </option>
+
+            ${workOptions}
+
+        </select>
+
+    </div>
+
+
+    <div class="modal-actions">
+
+        <button
+        class="btn btn-primary"
+        onclick="
+            saveDua(
+                '${categoryId}',
+                '${id || ""}'
+            )
+        ">
+
+            حفظ
+
+        </button>
+
+
+        <button
+        class="btn"
+        onclick="closeModal()">
+
+            إلغاء
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    showModal();
+
+}
+
+
+/* =========================================================
+   SAVE DUA
+========================================================= */
+
+function saveDua(
+    categoryId,
+    id
+){
+
+    const category =
+        findNode(
+            appData.duaCategories,
+            categoryId
+        );
+
+
+    if(!category)
+        return;
+
+
+    const name =
+        document
+        .getElementById("duaName")
+        .value
+        .trim();
+
+
+    if(!name){
+
+        alert("اكتبي اسم الدعاء");
+
+        return;
+
+    }
+
+
+    let dua =
+        id
+        ? category.children.find(
+            item => item.id === id
+        )
+        : null;
+
+
+    if(!dua){
+
+        dua = {
+
+            id:uid("dua"),
+
+            type:"dua",
+
+            name:"",
+
+            description:"",
+
+            text:"",
+
+            linkedWorkId:null
+
+        };
+
+        category.children.push(dua);
+
+    }
+
+
+    dua.name = name;
+
+
+    dua.description =
+        document
+        .getElementById(
+            "duaDescription"
+        )
+        .value
+        .trim();
+
+
+    dua.text =
+        document
+        .getElementById(
+            "duaText"
+        )
+        .value;
+
+
+    dua.linkedWorkId =
+        document
+        .getElementById(
+            "duaWork"
+        )
+        .value
+        || null;
+
+
+    save();
+
+    closeModal();
+
+    renderActivities();
+
+}
+
+
+/* =========================================================
+   DELETE DUA
+========================================================= */
+
+function deleteDua(
+    categoryId,
+    id
+){
+
+    if(!confirm(
+        "حذف هذا الدعاء؟"
+    ))
+        return;
+
+
+    const category =
+        findNode(
+            appData.duaCategories,
+            categoryId
+        );
+
+
+    category.children =
+        category.children.filter(
+            item => item.id !== id
+        );
+
+
+    save();
+
+    renderActivities();
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function renderChart(){
+
+    const labels=[];
+    const data=[];
+
+
+    for(
+        let i=currentChartRange-1;
+        i>=0;
+        i--
+    ){
+
+        const date =
+            new Date();
+
+        date.setDate(
+            date.getDate()-i
+        );
+
+
+        const dateString =
+            localDate(date);
+
+
+        labels.push(
+            date.toLocaleDateString(
+                "ar-EG",
+                {
+                    weekday:"short",
+                    day:"numeric"
+                }
+            )
+        );
+
+
+        if(appData.logs[dateString]){
+
+            data.push(
+                totals(
+                    dateString
+                ).final
+            );
+
+        }else{
+
+            data.push(null);
+
+        }
+
+    }
+
+
+    const canvas =
+        document
+        .getElementById(
+            "progressChart"
+        );
+
+
+    const context =
+        canvas.getContext("2d");
+
+
+    if(chart)
+        chart.destroy();
+
+
+    const dark =
+        document.body
+        .classList
+        .contains("dark");
+
+
+    chart =
+        new Chart(
+            context,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels,
+
+                    datasets:[
+
+                        {
+
+                            label:"النقاط",
+
+                            data,
+
+                            borderColor:"#c88a9a",
+
+                            backgroundColor:
+                                dark
+                                ? "#3d2530"
+                                : "#f8e8ec",
+
+                            fill:true,
+
+                            tension:.35,
+
+                            borderWidth:3,
+
+                            pointRadius:4,
+
+                            spanGaps:true
+
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    plugins:{
+
+                        legend:{
+                            display:false
+                        }
+
+                    },
+
+                    scales:{
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            ticks:{
+                                color:
+                                    dark
+                                    ? "#94a3b8"
+                                    : "#64748b"
+                            }
+
+                        },
+
+                        x:{
+
+                            ticks:{
+                                color:
+                                    dark
+                                    ? "#94a3b8"
+                                    : "#64748b",
+
+                                font:{
+                                    size:10
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    const valid =
+        data.filter(
+            value => value !== null
+        );
+
+
+    const average =
+        valid.length
+        ? Math.round(
+            valid.reduce(
+                (a,b)=>a+b,
+                0
+            ) / valid.length
+        )
+        : 0;
+
+
+    const maximum =
+        valid.length
+        ? Math.max(...valid)
+        : 0;
+
+
+    document.getElementById(
+        "progressStats"
+    ).innerHTML = `
+
+    <div class="stat-box">
+
+        <div class="stat-label">
+            متوسط النقاط
+        </div>
+
+        <div class="stat-value">
+
+            ${average.toLocaleString("ar-EG")}
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-box">
+
+        <div class="stat-label">
+            أعلى يوم
+        </div>
+
+        <div class="stat-value">
+
+            ${maximum.toLocaleString("ar-EG")}
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+function updateChartRange(days){
+
+    currentChartRange =
+        days;
+
+    renderChart();
+
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+function renderMessages(){
+
+    const container =
+        document.getElementById(
+            "messagesList"
+        );
+
+
+    if(!appData.messages.length){
+
+        container.innerHTML = `
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                💌
+            </div>
+
+            <div>
+                لا توجد رسائل بعد.
+            </div>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        appData.messages
+        .map(
+            message => `
+
+            <div class="card">
+
+                <div
+                style="
+                display:flex;
+                gap:8px">
+
+                    <div
+                    style="
+                    flex:1;
+                    line-height:1.7">
+
+                        ${escapeHtml(
+                            message.text
+                        )}
+
+                    </div>
+
+
+                    <button
+                    class="mini"
+                    onclick="
+                        openMessageModal(
+                            '${message.id}'
+                        )
+                    ">
+
+                        ✏️
+
+                    </button>
+
+
+                    <button
+                    class="mini"
+                    onclick="
+                        deleteMessage(
+                            '${message.id}'
+                        )
+                    ">
+
+                        🗑️
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            `
+        )
+        .join("");
+
+}
+
+
+function openMessageModal(id=null){
+
+    const existing =
+        id
+        ? appData.messages.find(
+            item => item.id === id
+        )
+        : null;
+
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = `
+
+    <h2>
+
+        ${
+            existing
+            ? "تعديل رسالة"
+            : "إضافة رسالة"
+        }
+
+        💌
+
+    </h2>
+
+
+    <div class="field">
+
+        <label>
+            النص
+        </label>
+
+        <textarea
+        id="messageText">${
+            existing
+            ? escapeHtml(existing.text)
+            : ""
+        }</textarea>
+
+    </div>
+
+
+    <div class="modal-actions">
+
+        <button
+        class="btn btn-primary"
+        onclick="
+            saveMessage(
+                '${id || ""}'
+            )
+        ">
+
+            حفظ
+
+        </button>
+
+
+        <button
+        class="btn"
+        onclick="closeModal()">
+
+            إلغاء
+
+        </button>
+
+    </div>
+
+    `;
+
+
+    showModal();
+
+}
+
+
+function saveMessage(id){
+
+    const text =
+        document
+        .getElementById(
+            "messageText"
+        )
+        .value
+        .trim();
+
+
+    if(!text){
+
+        alert("اكتبي الرسالة");
+
+        return;
+
+    }
+
+
+    if(id){
+
+        const message =
+            appData.messages.find(
+                item => item.id === id
+            );
+
+        message.text = text;
+
+    }else{
+
+        appData.messages.push({
+
+            id:uid("message"),
+
+            text:text
+
+        });
+
+    }
+
+
+    save();
+
+    closeModal();
+
+    renderMessages();
+
+    renderHome();
+
+}
+
+
+function deleteMessage(id){
+
+    if(!confirm(
+        "حذف الرسالة؟"
+    ))
+        return;
+
+
+    appData.messages =
+        appData.messages.filter(
+            item => item.id !== id
+        );
+
+
+    save();
+
+    renderMessages();
+
+    renderHome();
+
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function loadSettings(){
+
+    document.getElementById(
+        "goalInput"
+    ).value =
+        appData.goal;
+
+
+    document.getElementById(
+        "darkModeBtn"
+    ).textContent =
+        document.body
+        .classList
+        .contains("dark")
+        ? "☀️"
+        : "🌙";
+
+}
+
+
+function updateGoal(){
+
+    const value =
+        Number(
+            document
+            .getElementById(
+                "goalInput"
+            )
+            .value
+        );
+
+
+    if(value > 0){
+
+        appData.goal =
+            value;
+
+        save();
+
+        renderHome();
+
+    }
+
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+function toggleDarkMode(){
+
+    document.body
+        .classList
+        .toggle("dark");
+
+
+    localStorage.setItem(
+        "muhasabaDark",
+        document.body
+        .classList
+        .contains("dark")
+    );
+
+
+    loadSettings();
+
+
+    if(chart)
+        renderChart();
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function showModal(){
+
+    document
+        .getElementById(
+            "modalOverlay"
+        )
+        .classList
+        .add("active");
+
+}
+
+
+function closeModal(){
+
+    document
+        .getElementById(
+            "modalOverlay"
+        )
+        .classList
+        .remove("active");
+
+}
+
+
+document
+    .getElementById(
+        "modalOverlay"
+    )
+    .addEventListener(
+        "click",
+        event => {
+
+            if(
+                event.target.id ===
+                "modalOverlay"
+            ){
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   BACKUP
+========================================================= */
+
+function exportBackup(){
+
+    const json =
+        JSON.stringify(
+            appData,
+            null,
+            2
+        );
+
+
+    const blob =
+        new Blob(
+            [json],
+            {
+                type:"application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+
+    link.download =
+        `muhasaba-backup-${today()}.json`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+
+function importBackup(event){
+
+    const file =
+        event.target.files[0];
+
+
+    if(!file)
+        return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(){
+
+            try{
+
+                const data =
+                    JSON.parse(
+                        reader.result
+                    );
+
+
+                if(
+                    !data ||
+                    !Array.isArray(
+                        data.positive
+                    ) ||
+                    !Array.isArray(
+                        data.negative
+                    ) ||
+                    !Array.isArray(
+                        data.duaCategories
+                    )
+                ){
+
+                    throw new Error(
+                        "Invalid backup"
+                    );
+
+                }
+
+
+                if(!confirm(
+                    "سيؤدي الاستيراد إلى استبدال البيانات الحالية. هل أنت متأكدة؟"
+                )){
+
+                    return;
+
+                }
+
+
+                appData =
+                    data;
+
+
+                migrateData(
+                    appData
+                );
+
+
+                save();
+
+                renderHome();
+
+                alert(
+                    "تم استيراد البيانات بنجاح 🤍"
+                );
+
+            }
+
+            catch(error){
+
+                console.error(error);
+
+                alert(
+                    "ملف النسخة الاحتياطية غير صالح."
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(
+        file
+    );
+
+
+    event.target.value = "";
+
+}
+
+
+/* =========================================================
+   CLEAR DATA
+========================================================= */
+
+function clearAllData(){
+
+    if(!confirm(
+        "سيتم حذف جميع الأعمال والأدعية والسجلات نهائيًا. هل أنت متأكدة؟"
+    ))
+        return;
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    appData =
+        createDefaultData();
+
+
+    save();
+
+
+    activityState = {
+
+        view:"categories",
+
+        categoryId:null,
+
+        parentId:null,
+
+        duaCategoryId:null,
+
+        duaId:null
+
+    };
+
+
+    renderHome();
+
+    navigateTo("home");
+
+}
+
+
+/* =========================================================
+   GOAL INPUT CHANGE
+========================================================= */
+
+document
+    .getElementById("goalInput")
+    .addEventListener(
+        "change",
+        updateGoal
+    );
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+if(
+    localStorage.getItem(
+        "muhasabaDark"
+    ) === "true"
+){
+
+    document.body
+        .classList
+        .add("dark");
+
+}
+
+
+renderHome();
+
+</script>
+
+</body>
+</html>
