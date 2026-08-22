@@ -706,11 +706,6 @@ style="color:var(--danger)">
 </div>
 
 
-<div
-id="comparisonBox"
-class="comparison-box">
-</div>
-
 
 <div id="dailyMessageContainer">
 </div>
@@ -804,6 +799,12 @@ onclick="openWorkRoot('negative')">
 الأعمال 📿
 </h2>
 
+<div class="card" style="margin-bottom:12px;padding:10px 12px">
+<div class="small-title" style="margin:0">📅 يتم تسجيل الأعمال في:</div>
+<div id="activityEditingDate" style="font-weight:800;margin-top:4px"></div>
+<button class="btn" style="margin-top:8px" onclick="navigateTo('progress')">تغيير التاريخ من صفحة تطوري</button>
+</div>
+
 <div id="activityView">
 </div>
 
@@ -819,6 +820,30 @@ onclick="openWorkRoot('negative')">
 <h2 class="section-title">
 تطوري 📈
 </h2>
+
+<div class="card" style="margin-bottom:12px">
+
+<div class="small-title">
+تعديل أعمال يوم سابق 📅
+</div>
+
+<div class="date-editor">
+<input
+ type="date"
+ id="editingDateInput"
+ onchange="changeEditingDate(this.value)">
+<button class="btn" onclick="setEditingDateToday()">اليوم</button>
+</div>
+
+<div id="editingDateLabel" class="small-title" style="margin:0"></div>
+
+<p style="font-size:12px;color:var(--muted);line-height:1.6;margin:8px 0 0">
+اختاري أي تاريخ سابق، ثم انتقلي إلى صفحة الأعمال وعدّلي الأعمال لذلك اليوم. النقاط ستُسجّل في التاريخ المحدد.
+</p>
+
+</div>
+
+<div id="progressComparison" class="comparison-box" style="margin-bottom:12px"></div>
 
 <div
 class="action-row"
@@ -1852,6 +1877,9 @@ function renderDailyMessage(){
 */
 
 function renderActivities(){
+
+    const dateLabel = document.getElementById("activityEditingDate");
+    if(dateLabel) dateLabel.textContent = formatArabicDate(editingDate);
 
     const container =
         document.getElementById(
@@ -4271,13 +4299,17 @@ function changeEditingDate(value){
     if(!value) return;
     editingDate = value;
     renderProgressPage();
-    renderActivities();
+    if(document.getElementById("page-activities")?.classList.contains("active")){
+        renderActivities();
+    }
 }
 
 function setEditingDateToday(){
     editingDate = today();
     renderProgressPage();
-    renderActivities();
+    if(document.getElementById("page-activities")?.classList.contains("active")){
+        renderActivities();
+    }
 }
 
 function formatArabicDate(dateString){
@@ -4327,6 +4359,15 @@ function renderProgressPage(){
     if(label) label.textContent = `سيتم تسجيل الأعمال في: ${formatArabicDate(editingDate)}`;
     renderProgressComparison();
     renderChart();
+
+    const stats = document.getElementById("progressStats");
+    if(stats){
+        const t = totals(editingDate);
+        stats.innerHTML = `
+        <div class="stat-box"><div class="stat-label">النقاط المكتسبة</div><div class="stat-value">${t.earned.toLocaleString("ar-EG")}</div></div>
+        <div class="stat-box" style="border-color:var(--danger)"><div class="stat-label">الخصومات</div><div class="stat-value" style="color:var(--danger)">${t.deducted.toLocaleString("ar-EG")}</div></div>
+        <div class="stat-box"><div class="stat-label">الصافي</div><div class="stat-value">${t.final.toLocaleString("ar-EG")}</div></div>`;
+    }
 }
 
 function renderChart(){
