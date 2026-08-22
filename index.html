@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-		<html lang="ar" dir="rtl"
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -515,11 +515,57 @@ label{
 }
 
 .reader-text{
-    font-size:17px;
+    font-size:var(--reader-font-size,17px);
     line-height:2.25;
     white-space:pre-wrap;
     text-align:right;
+    overflow-wrap:anywhere;
+    word-break:normal;
 }
+
+.reader-controls{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+}
+
+.reader-controls .btn{
+    min-width:44px;
+}
+
+.date-editor{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.date-editor input{
+    flex:1;
+}
+
+.attachment-box{
+    margin-top:12px;
+    padding:12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+}
+
+.attachment-box img{
+    max-width:100%;
+    border-radius:10px;
+    display:block;
+    margin-top:8px;
+}
+
+.attachment-box audio{
+    width:100%;
+    margin-top:8px;
+}
+
 
 .reader-done{
     margin-top:18px;
@@ -1123,6 +1169,8 @@ const STORAGE_KEY = "muhasabaDataV4";
 let appData = loadData();
 
 let currentChartRange = 7;
+let editingDate = today();
+let readerFontSize = Number(localStorage.getItem("muhasabaReaderFontSize") || 17);
 
 let chart = null;
 
@@ -1376,7 +1424,10 @@ function loadData(){
 
 function migrateData(data){
 
-    data.version = 4;
+    data.version = 5;
+
+    if(!data.dailyMessageAssignments)
+        data.dailyMessageAssignments = {};
 
     if(!data.goal)
         data.goal = 20000;
@@ -1392,6 +1443,9 @@ function migrateData(data){
 
     if(!Array.isArray(data.messages))
         data.messages = [];
+
+    if(!data.dailyMessageAssignments)
+        data.dailyMessageAssignments = {};
 
     if(!data.logs)
         data.logs = {};
@@ -1527,14 +1581,14 @@ function getLog(date=today()){
 }
 
 
-function isDone(id,date=today()){
+function isDone(id,date=editingDate){
 
     return !!getLog(date).completed[id];
 
 }
 
 
-function setDone(id,value,date=today()){
+function setDone(id,value,date=editingDate){
 
     getLog(date).completed[id] = value;
 
@@ -1632,7 +1686,7 @@ function navigateTo(page,element){
         renderActivities();
 
     if(page === "progress")
-        renderChart();
+        renderProgressPage();
 
     if(page === "messages")
         renderMessages();
@@ -1723,210 +1777,62 @@ function renderHome(){
         .toLocaleString("ar-EG");
 
 
-    const yesterday =
-        new Date();
-
-    yesterday.setDate(
-        yesterday.getDate()-1
-    );
-
-    const yesterdayString =
-        localDate(yesterday);
-
-    const yesterdayLog =
-        appData.logs[yesterdayString];
-
-
-    if(yesterdayLog){
-
-        const yesterdayTotals =
-            totals(yesterdayString);
-
-        const difference =
-            totalsToday.final -
-            yesterdayTotals.final;
-
-
-        let status =
-            "بقي كما هو";
-
-        let color =
-            "var(--muted)";
-
-        if(difference > 0){
-
-            status =
-                "ارتفع عن الأمس";
-
-            color =
-                "var(--primary)";
-
-        }
-
-        if(difference < 0){
-
-            status =
-                "انخفض عن الأمس";
-
-            color =
-                "var(--danger)";
-
-        }
-
-
-        document.getElementById(
-            "comparisonBox"
-        ).innerHTML = `
-
-        <div style="
-        display:flex;
-        justify-content:space-between;
-        font-weight:800;
-        margin-bottom:8px">
-
-            <span>
-                مقارنة بالأمس
-            </span>
-
-            <span style="
-            font-size:12px;
-            color:${color}">
-
-                ${status}
-
-            </span>
-
-        </div>
-
-
-        <div style="
-        display:flex;
-        justify-content:space-between;
-        color:var(--muted);
-        font-size:13px">
-
-            <span>
-                نقاط الأمس:
-                <b style="color:var(--text)">
-                ${yesterdayTotals.final.toLocaleString("ar-EG")}
-                </b>
-            </span>
-
-
-            <span>
-                اليوم:
-                <b style="color:var(--text)">
-                ${totalsToday.final.toLocaleString("ar-EG")}
-                </b>
-            </span>
-
-        </div>
-
-
-        <div style="
-        text-align:center;
-        color:${color};
-        font-size:18px;
-        font-weight:800;
-        margin-top:8px">
-
-            ${difference > 0 ? "+" : ""}
-            ${difference.toLocaleString("ar-EG")}
-            نقطة
-            ${difference > 0 ? "📈" : difference < 0 ? "📉" : "↔️"}
-
-        </div>
-
-        `;
-
-    }else{
-
-        document.getElementById(
-            "comparisonBox"
-        ).innerHTML = `
-
-        <div style="
-        text-align:center;
-        color:var(--muted);
-        font-size:13px">
-
-            لا توجد بيانات لليوم السابق للمقارنة.
-
-        </div>
-
-        `;
-
-    }
-
-
     renderDailyMessage();
 
 }
 
 
-function renderDailyMessage(){
+function getDailyMessage(date=today()){
 
-    const container =
-        document.getElementById(
-            "dailyMessageContainer"
-        );
+    if(!appData.messages.length)
+        return null;
 
-
-    if(!appData.messages.length){
-
-        container.innerHTML = "";
-
-        return;
-
+    const existingId = appData.dailyMessageAssignments?.[date];
+    if(existingId){
+        const existing = appData.messages.find(m => m.id === existingId);
+        if(existing) return existing;
     }
 
+    let d = new Date(date + "T12:00:00");
+    d.setDate(d.getDate()-1);
+    const previousDate = localDate(d);
+    const previousId = appData.dailyMessageAssignments?.[previousDate];
+    let index = -1;
 
-    const start =
-        new Date(2024,0,1);
+    if(previousId){
+        index = appData.messages.findIndex(m => m.id === previousId);
+    }
 
-    const days =
-        Math.floor(
-            (new Date()-start) /
-            86400000
-        );
+    if(index >= 0) index = (index + 1) % appData.messages.length;
+    else {
+        const start = new Date(2024,0,1);
+        const days = Math.floor((new Date(date + "T12:00:00")-start)/86400000);
+        index = ((days % appData.messages.length)+appData.messages.length)%appData.messages.length;
+    }
 
+    const message = appData.messages[index];
+    if(message){
+        appData.dailyMessageAssignments[date] = message.id;
+        save();
+    }
+    return message || null;
+}
 
-    const index =
-        days %
-        appData.messages.length;
+function renderDailyMessage(){
+    const container = document.getElementById("dailyMessageContainer");
+    const message = getDailyMessage(today());
 
-
-    const message =
-        appData.messages[index];
-
+    if(!message){
+        container.innerHTML = "";
+        return;
+    }
 
     container.innerHTML = `
-
     <div class="msg-card">
-
-        <div style="font-size:26px">
-            💌
-        </div>
-
-        <div style="
-        font-weight:800;
-        color:var(--primary);
-        margin:5px">
-
-            رسالة اليوم
-
-        </div>
-
-        <div style="line-height:1.7">
-
-            "${escapeHtml(message.text)}"
-
-        </div>
-
-    </div>
-
-    `;
-
+        <div style="font-size:26px">💌</div>
+        <div style="font-weight:800;color:var(--primary);margin:5px">رسالة اليوم</div>
+        <div style="line-height:1.7">"${escapeHtml(message.text)}"</div>
+    </div>`;
 }
 
 
@@ -2757,7 +2663,7 @@ function toggleWork(id){
 
     if(work.linkedDuaId){
 
-        getLog().completed[
+        getLog(editingDate).completed[
             work.linkedDuaId
         ] = newValue;
 
@@ -3678,121 +3584,68 @@ function renderDuaList(container){
    DUA READER
 ========================================================= */
 
-function renderDuaReader(container){
+async function renderDuaReader(container){
+    const category = findNode(appData.duaCategories, activityState.duaCategoryId);
+    if(!category) return;
 
-    const category =
-        findNode(
-            appData.duaCategories,
-            activityState.duaCategoryId
-        );
+    const dua = category.children.find(item => item.id === activityState.duaId);
+    if(!dua) return;
 
-
-    if(!category)
-        return;
-
-
-    const dua =
-        category.children.find(
-            item =>
-                item.id ===
-                activityState.duaId
-        );
-
-
-    if(!dua)
-        return;
-
-
-    const done =
-        isDone(dua.id);
-
+    const done = isDone(dua.id);
+    const fontSize = Math.max(13, Math.min(32, readerFontSize));
+    const attachment = dua.attachment;
+    let attachmentHtml = "";
+    if(attachment){
+        const blob = await getAttachmentBlob(dua.id);
+        if(blob){
+            const objectUrl = URL.createObjectURL(blob);
+            if(attachment.type?.startsWith("image/")){
+                attachmentHtml = `<div class="attachment-box"><b>📎 ${escapeHtml(attachment.name)}</b><img src="${objectUrl}" alt="مرفق الدعاء"></div>`;
+            }else if(attachment.type?.startsWith("audio/")){
+                attachmentHtml = `<div class="attachment-box"><b>🎧 ${escapeHtml(attachment.name)}</b><audio controls src="${objectUrl}"></audio></div>`;
+            }else if(attachment.type === "application/pdf"){
+                attachmentHtml = `<div class="attachment-box"><b>📄 ${escapeHtml(attachment.name)}</b><div style="margin-top:8px"><a class="btn btn-primary" href="${objectUrl}" target="_blank" rel="noopener">فتح ملف PDF</a></div></div>`;
+            }
+        }
+    }
 
     container.innerHTML = `
-
-    <button
-    class="btn back-btn"
-    onclick="
-        activityState.view='duaList';
-        renderActivities();
-    ">
-
-        → رجوع للقائمة
-
-    </button>
-
+    <button class="btn back-btn" onclick="activityState.view='duaList';renderActivities()">→ رجوع للقائمة</button>
 
     <div class="card">
+        <div class="reader-title">${escapeHtml(dua.name)}</div>
 
-        <div class="reader-title">
+        ${dua.description ? `<div class="small-title" style="text-align:center">${escapeHtml(dua.description)}</div>` : ""}
 
-            ${escapeHtml(dua.name)}
-
+        <div class="reader-controls">
+            <button class="btn" onclick="changeReaderFont(-1)">A−</button>
+            <button class="btn" onclick="resetReaderFont()">حجم الخط</button>
+            <button class="btn" onclick="changeReaderFont(1)">A+</button>
         </div>
 
-
-        ${
-            dua.description
-            ? `
-            <div
-            class="small-title"
-            style="text-align:center">
-
-                ${escapeHtml(
-                    dua.description
-                )}
-
-            </div>
-            `
-            : ""
-        }
-
-
-        <div class="reader-text">
-
-            ${
-                escapeHtml(
-                    dua.text ||
-                    "لا يوجد نص بعد. يمكنك تعديل الدعاء وإضافة النص الكامل."
-                )
-            }
-
+        <div class="reader-text" style="--reader-font-size:${fontSize}px">
+            ${escapeHtml(dua.text || "لا يوجد نص بعد. يمكنك تعديل الدعاء وإضافة النص الكامل.")}
         </div>
 
+        ${attachmentHtml}
 
-        <div
-        class="reader-done"
-        onclick="
-            toggleDua(
-                '${dua.id}'
-            )
-        ">
-
-
-            <div
-            class="check
-            ${done ? "done" : ""}">
-
-                ${done ? "✓" : ""}
-
-            </div>
-
-
-            <b>
-
-                ${
-                    done
-                    ? "تم إتمام القراءة"
-                    : "إتمام القراءة"
-                }
-
-            </b>
-
+        <div class="reader-done" onclick="toggleDua('${dua.id}')">
+            <div class="check ${done ? "done" : ""}">${done ? "✓" : ""}</div>
+            <b>${done ? "تم إتمام القراءة" : "إتمام القراءة"}</b>
         </div>
+    </div>`;
+}
 
-    </div>
+function changeReaderFont(step){
+    readerFontSize = Math.max(13, Math.min(32, readerFontSize + step));
+    localStorage.setItem("muhasabaReaderFontSize", readerFontSize);
+    renderActivities();
+}
 
-    `;
-
+function resetReaderFont(){
+    readerFontSize = 17;
+    localStorage.setItem("muhasabaReaderFontSize", readerFontSize);
+    renderActivities();
 }
 
 
@@ -3824,7 +3677,7 @@ function toggleDua(id){
 
     if(dua.linkedWorkId){
 
-        getLog().completed[
+        getLog(editingDate).completed[
             dua.linkedWorkId
         ] = newValue;
 
@@ -4108,6 +3961,27 @@ function openDuaModal(
     <div class="field">
 
         <label>
+            ملف مرفق - اختياري (PDF / صوت / صورة)
+        </label>
+
+        <input
+        id="duaAttachment"
+        type="file"
+        accept="application/pdf,audio/*,image/*">
+
+        ${existing && existing.attachment ? `
+        <div class="attachment-box">
+            📎 يوجد ملف مرفق: ${escapeHtml(existing.attachment.name || "ملف")}
+            <label style="margin-top:8px">
+                <input type="checkbox" id="removeDuaAttachment" style="width:auto;margin-left:6px"> حذف المرفق الحالي
+            </label>
+        </div>` : ""}
+
+    </div>
+
+    <div class="field">
+
+        <label>
             ربط الدعاء بعمل يزيد النقاط
         </label>
 
@@ -4162,7 +4036,64 @@ function openDuaModal(
    SAVE DUA
 ========================================================= */
 
-function saveDua(
+const ATTACHMENT_DB_NAME = "muhasabaAttachmentsV1";
+const ATTACHMENT_STORE = "files";
+
+function openAttachmentDB(){
+    return new Promise((resolve,reject)=>{
+        const request = indexedDB.open(ATTACHMENT_DB_NAME,1);
+        request.onupgradeneeded = () => {
+            if(!request.result.objectStoreNames.contains(ATTACHMENT_STORE))
+                request.result.createObjectStore(ATTACHMENT_STORE);
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function saveAttachmentBlob(id,file){
+    const db = await openAttachmentDB();
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction(ATTACHMENT_STORE,"readwrite");
+        tx.objectStore(ATTACHMENT_STORE).put(file,id);
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+    });
+}
+
+async function getAttachmentBlob(id){
+    if(!id) return null;
+    try{
+        const db = await openAttachmentDB();
+        return await new Promise((resolve,reject)=>{
+            const tx = db.transaction(ATTACHMENT_STORE,"readonly");
+            const request = tx.objectStore(ATTACHMENT_STORE).get(id);
+            request.onsuccess = () => { db.close(); resolve(request.result || null); };
+            request.onerror = () => { db.close(); reject(request.error); };
+        });
+    }catch(error){
+        console.error(error);
+        return null;
+    }
+}
+
+async function deleteAttachmentBlob(id){
+    if(!id) return;
+    try{
+        const db = await openAttachmentDB();
+        await new Promise((resolve,reject)=>{
+            const tx = db.transaction(ATTACHMENT_STORE,"readwrite");
+            tx.objectStore(ATTACHMENT_STORE).delete(id);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+    }catch(error){
+        console.error(error);
+    }
+}
+
+async function saveDua(
     categoryId,
     id
 ){
@@ -4216,7 +4147,9 @@ function saveDua(
 
             text:"",
 
-            linkedWorkId:null
+            linkedWorkId:null,
+
+            attachment:null
 
         };
 
@@ -4253,6 +4186,38 @@ function saveDua(
         .value
         || null;
 
+    const attachmentInput = document.getElementById("duaAttachment");
+    const removeAttachment = document.getElementById("removeDuaAttachment");
+
+    if(removeAttachment?.checked){
+        dua.attachment = null;
+    }
+
+    if(attachmentInput?.files?.[0]){
+        const file = attachmentInput.files[0];
+        const allowed = file.type === "application/pdf" || file.type.startsWith("audio/") || file.type.startsWith("image/");
+        if(!allowed){
+            alert("نوع الملف غير مدعوم. اختاري PDF أو ملفًا صوتيًا أو صورة.");
+            return;
+        }
+        if(file.size > 25 * 1024 * 1024){
+            alert("حجم الملف كبير جدًا. الحد الأقصى 25MB.");
+            return;
+        }
+        try{
+            if(!dua.id) dua.id = uid("dua");
+            await saveAttachmentBlob(dua.id,file);
+            dua.attachment = {
+                name:file.name,
+                type:file.type,
+                size:file.size
+            };
+        }catch(error){
+            console.error(error);
+            alert("تعذر حفظ الملف المرفق.");
+            return;
+        }
+    }
 
     save();
 
@@ -4301,6 +4266,68 @@ function deleteDua(
 /* =========================================================
    CHART
 ========================================================= */
+
+function changeEditingDate(value){
+    if(!value) return;
+    editingDate = value;
+    renderProgressPage();
+    renderActivities();
+}
+
+function setEditingDateToday(){
+    editingDate = today();
+    renderProgressPage();
+    renderActivities();
+}
+
+function formatArabicDate(dateString){
+    return new Date(dateString + "T12:00:00").toLocaleDateString("ar-EG", {
+        weekday:"long", year:"numeric", month:"long", day:"numeric"
+    });
+}
+
+function renderProgressComparison(){
+    const box = document.getElementById("progressComparison");
+    if(!box) return;
+
+    const current = totals(editingDate);
+    const d = new Date(editingDate + "T12:00:00");
+    d.setDate(d.getDate()-1);
+    const previousDate = localDate(d);
+    const previous = totals(previousDate);
+    const hasPrevious = !!appData.logs[previousDate];
+
+    if(!hasPrevious){
+        box.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:13px">لا توجد بيانات لليوم السابق للمقارنة.</div>`;
+        return;
+    }
+
+    const difference = current.final - previous.final;
+    const status = difference > 0 ? "ارتفع عن اليوم السابق" : difference < 0 ? "انخفض عن اليوم السابق" : "بقي كما هو";
+    const color = difference > 0 ? "var(--primary)" : difference < 0 ? "var(--danger)" : "var(--muted)";
+
+    box.innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-weight:800;margin-bottom:8px">
+        <span>مقارنة باليوم السابق</span>
+        <span style="font-size:12px;color:${color}">${status}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px">
+        <span>السابق: <b style="color:var(--text)">${previous.final.toLocaleString("ar-EG")}</b></span>
+        <span>المحدد: <b style="color:var(--text)">${current.final.toLocaleString("ar-EG")}</b></span>
+    </div>
+    <div style="text-align:center;color:${color};font-size:18px;font-weight:800;margin-top:8px">
+        ${difference > 0 ? "+" : ""}${difference.toLocaleString("ar-EG")} نقطة ${difference > 0 ? "📈" : difference < 0 ? "📉" : "↔️"}
+    </div>`;
+}
+
+function renderProgressPage(){
+    const input = document.getElementById("editingDateInput");
+    if(input) input.value = editingDate;
+    const label = document.getElementById("editingDateLabel");
+    if(label) label.textContent = `سيتم تسجيل الأعمال في: ${formatArabicDate(editingDate)}`;
+    renderProgressComparison();
+    renderChart();
+}
 
 function renderChart(){
 
