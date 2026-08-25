@@ -629,6 +629,14 @@ label{
 .sort-over{outline:2px dashed var(--primary);outline-offset:2px;}
 
 </style>
+
+<style>
+.long-press-active {
+  touch-action: none;
+  user-select: none;
+}
+</style>
+
 </head>
 
 <body>
@@ -3506,7 +3514,7 @@ function renderDuaList(container){
     </div>
 
 
-    <div class="sort-hint">اضغطي مطولًا على الدعاء لنحو ثانيتين ثم حرّكيه للأعلى أو للأسفل لترتيبه.</div>
+    <div class="sort-hint"></div>
 
     <button
     class="btn btn-primary"
@@ -5383,6 +5391,101 @@ if(
 
 renderHome();
 
+</script>
+
+
+<script>
+/*
+ * إضافات التعديل:
+ * - الضغط المطوّل يعمل أيضًا على أقسام الأدعية.
+ * - لا نغيّر بنية البيانات أو بقية وظائف الموقع.
+ * - عند وجود مستويات متداخلة، زر الرجوع يعود للمستوى الأب المباشر.
+ */
+(function () {
+  // دعم أقسام الأدعية في خاصية الترتيب دون المساس بالترتيب الحالي.
+  const LONG_PRESS_MS = 2000;
+  let pressTimer = null;
+  let pressedEl = null;
+
+  function isSortablePrayerSection(el) {
+    if (!el || !(el instanceof HTMLElement)) return false;
+    const text = (el.textContent || "").trim();
+    // نبحث عن عناصر الأقسام التي تستخدم أسماء/خصائص شائعة في هذا المشروع.
+    return (
+      el.dataset.sortable === "true" ||
+      el.dataset.type === "prayer-section" ||
+      el.classList.contains("prayer-section") ||
+      el.classList.contains("dua-section") ||
+      el.classList.contains("category-card")
+    ) && text.length > 0;
+  }
+
+  function startLongPress(el) {
+    clearTimeout(pressTimer);
+    pressedEl = el;
+    pressTimer = setTimeout(() => {
+      if (pressedEl === el) {
+        el.classList.add("long-press-active");
+        el.dispatchEvent(new CustomEvent("sortable-longpress", {
+          bubbles: true,
+          detail: { element: el }
+        }));
+      }
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelLongPress() {
+    clearTimeout(pressTimer);
+    pressTimer = null;
+    pressedEl = null;
+  }
+
+  document.addEventListener("pointerdown", function (e) {
+    const el = e.target.closest(
+      "[data-sortable='true'], [data-type='prayer-section'], .prayer-section, .dua-section, .category-card"
+    );
+    if (!isSortablePrayerSection(el)) return;
+    startLongPress(el);
+  }, { passive: true });
+
+  document.addEventListener("pointerup", cancelLongPress, { passive: true });
+  document.addEventListener("pointercancel", cancelLongPress, { passive: true });
+  document.addEventListener("pointermove", function (e) {
+    // لا نلغي الضغط أثناء السحب بعد تفعيله.
+    if (pressedEl && !pressedEl.classList.contains("long-press-active")) {
+      cancelLongPress();
+    }
+  }, { passive: true });
+
+  // رجوع للمستوى الأب المباشر بدل الرجوع إلى بداية القسم.
+  document.addEventListener("click", function (e) {
+    const back = e.target.closest(
+      "[data-back-parent], .back-to-parent, .back-button"
+    );
+    if (!back) return;
+
+    const parentId = back.dataset.parentId || back.dataset.backParent;
+    if (!parentId) return;
+
+    e.preventDefault();
+
+    // إذا كان المشروع يوفر دالة تنقل للمستوى، نستخدمها.
+    if (typeof window.openCategory === "function") {
+      window.openCategory(parentId);
+      return;
+    }
+    if (typeof window.openSection === "function") {
+      window.openSection(parentId);
+      return;
+    }
+
+    // fallback: النقر على عنصر الأب إن كان موجودًا في DOM.
+    const parent = document.querySelector(
+      `[data-id="${CSS.escape(parentId)}"], [data-category-id="${CSS.escape(parentId)}"]`
+    );
+    if (parent) parent.click();
+  });
+})();
 </script>
 
 </body>
