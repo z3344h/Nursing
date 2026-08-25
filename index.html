@@ -603,6 +603,31 @@ label{
 
 }
 
+
+/* إضافات ترتيب العناصر والعودة لأعلى الدعاء */
+.dua-top-btn{
+    position:fixed;
+    left:18px;
+    bottom:88px;
+    z-index:1000;
+    width:44px;
+    height:44px;
+    border:1px solid var(--border);
+    border-radius:50%;
+    background:var(--surface);
+    color:var(--text);
+    box-shadow:var(--shadow);
+    font-size:22px;
+    font-weight:800;
+}
+.sort-hint{
+    color:var(--muted);
+    font-size:12px;
+    margin:0 0 10px;
+}
+.sort-dragging{opacity:.55;}
+.sort-over{outline:2px dashed var(--primary);outline-offset:2px;}
+
 </style>
 </head>
 
@@ -799,12 +824,6 @@ onclick="openWorkRoot('negative')">
 الأعمال 📿
 </h2>
 
-<div class="card" style="margin-bottom:12px;padding:10px 12px">
-<div class="small-title" style="margin:0">📅 يتم تسجيل الأعمال في:</div>
-<div id="activityEditingDate" style="font-weight:800;margin-top:4px"></div>
-<button class="btn" style="margin-top:8px" onclick="navigateTo('progress')">تغيير التاريخ من صفحة تطوري</button>
-</div>
-
 <div id="activityView">
 </div>
 
@@ -820,6 +839,22 @@ onclick="openWorkRoot('negative')">
 <h2 class="section-title">
 تطوري 📈
 </h2>
+
+<div class="chart-container">
+
+<canvas
+id="progressChart"
+height="210">
+</canvas>
+
+</div>
+
+
+
+
+<div id="progressComparison" class="comparison-box" style="margin-bottom:12px"></div>
+
+
 
 <div class="card" style="margin-bottom:12px">
 
@@ -843,7 +878,7 @@ onclick="openWorkRoot('negative')">
 
 </div>
 
-<div id="progressComparison" class="comparison-box" style="margin-bottom:12px"></div>
+
 
 <div
 class="action-row"
@@ -864,20 +899,14 @@ onclick="updateChartRange(30)">
 </div>
 
 
-<div class="chart-container">
-
-<canvas
-id="progressChart"
-height="210">
-</canvas>
-
-</div>
 
 
 <div
 id="progressStats"
 class="stats-grid">
 </div>
+
+
 
 </section>
 
@@ -2326,6 +2355,8 @@ function renderWorkBrowser(
     </div>
 
 
+    <div class="sort-hint">اضغطي مطولًا على العمل أو القسم لنحو ثانيتين ثم حرّكيه للأعلى أو للأسفل لترتيبه.</div>
+
     <div
     class="action-row"
     style="margin-bottom:12px">
@@ -2402,7 +2433,11 @@ function renderWorkBrowser(
             html += `
 
             <div
-            class="tree-item"
+            class="tree-item sortable-node"
+            data-sort-id="${node.id}"
+            data-sort-kind="work-category"
+            data-sort-type="${type}"
+            data-sort-parent="${parentId || ""}"
             onclick="
                 activityState.view='workFolder';
                 activityState.categoryId='${type}';
@@ -2486,8 +2521,12 @@ function renderWorkBrowser(
             html += `
 
             <div
-            class="tree-item
-            ${type === "negative" ? "deduction" : ""}">
+            class="tree-item sortable-node
+            ${type === "negative" ? "deduction" : ""}"
+            data-sort-id="${node.id}"
+            data-sort-kind="work"
+            data-sort-type="${type}"
+            data-sort-parent="${parentId || ""}">
 
                 <div
                 class="work-row"
@@ -3467,6 +3506,8 @@ function renderDuaList(container){
     </div>
 
 
+    <div class="sort-hint">اضغطي مطولًا على الدعاء لنحو ثانيتين ثم حرّكيه للأعلى أو للأسفل لترتيبه.</div>
+
     <button
     class="btn btn-primary"
     style="margin-bottom:12px"
@@ -3514,7 +3555,10 @@ function renderDuaList(container){
 
         html += `
 
-        <div class="tree-item">
+        <div class="tree-item sortable-node"
+        data-sort-id="${dua.id}"
+        data-sort-kind="dua"
+        data-sort-category="${category.id}">
 
             <div
             class="work-row"
@@ -3661,7 +3705,10 @@ async function renderDuaReader(container){
             <div class="check ${done ? "done" : ""}">${done ? "✓" : ""}</div>
             <b>${done ? "تم إتمام القراءة" : "إتمام القراءة"}</b>
         </div>
-    </div>`;
+
+        <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="goToNextDua()">التالي ←</button>
+    </div>
+    <button class="dua-top-btn" onclick="scrollDuaToTop()" aria-label="العودة إلى أعلى الدعاء">↑</button>`;
 }
 
 function changeReaderFont(step){
@@ -3675,6 +3722,129 @@ function resetReaderFont(){
     localStorage.setItem("muhasabaReaderFontSize", readerFontSize);
     renderActivities();
 }
+
+
+/* =========================================================
+   DUA READER NAVIGATION
+========================================================= */
+function scrollDuaToTop(){
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function goToNextDua(){
+    const category = findNode(appData.duaCategories, activityState.duaCategoryId);
+    if(!category) return;
+    const list = category.children || [];
+    const index = list.findIndex(item => item.id === activityState.duaId);
+    if(index < 0 || index >= list.length - 1){
+        alert("هذا آخر دعاء في هذا القسم 🤍");
+        return;
+    }
+    activityState.duaId = list[index + 1].id;
+    renderActivities();
+    setTimeout(() => window.scrollTo({top:0,behavior:"smooth"}), 50);
+}
+
+
+/* =========================================================
+   LONG-PRESS REORDERING
+========================================================= */
+(function(){
+    let pressTimer = null;
+    let dragNode = null;
+    let dragStarted = false;
+    let pointerId = null;
+
+    function getNodeFromPoint(y){
+        const nodes = [...document.querySelectorAll('.sortable-node')]
+            .filter(el => el !== dragNode && el.offsetParent !== null);
+        let closest = null;
+        let best = Infinity;
+        nodes.forEach(el => {
+            const r = el.getBoundingClientRect();
+            const distance = Math.abs(y - (r.top + r.height/2));
+            if(distance < best){ best = distance; closest = el; }
+        });
+        return closest;
+    }
+
+    function reorderData(node){
+        const kind = node.dataset.sortKind;
+        const id = node.dataset.sortId;
+        if(!id) return;
+
+        if(kind === "dua"){
+            const category = findNode(appData.duaCategories, node.dataset.sortCategory);
+            if(!category) return;
+            const arr = category.children || [];
+            const from = arr.findIndex(x => x.id === id);
+            if(from < 0) return;
+            const domIds = [...node.parentElement.querySelectorAll('.sortable-node')].map(x => x.dataset.sortId);
+            const ordered = domIds.map(x => arr.find(item => item.id === x)).filter(Boolean);
+            arr.splice(0, arr.length, ...ordered);
+        }else{
+            const type = node.dataset.sortType;
+            const parentId = node.dataset.sortParent || null;
+            const root = type === "positive" ? appData.positive : appData.negative;
+            const parent = parentId ? findNode(root,parentId) : null;
+            if(parent && !parent.children) parent.children=[];
+            const arr = parent ? parent.children : root;
+            const domIds = [...node.parentElement.querySelectorAll('.sortable-node')].map(x => x.dataset.sortId);
+            const ordered = domIds.map(x => arr.find(item => item.id === x)).filter(Boolean);
+            // Keep any items not represented in the current DOM at the end.
+            arr.forEach(item => { if(!ordered.includes(item)) ordered.push(item); });
+            arr.splice(0, arr.length, ...ordered);
+        }
+        save();
+    }
+
+    function finishDrag(){
+        if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+        if(dragNode){
+            dragNode.classList.remove('sort-dragging');
+            dragNode.releasePointerCapture?.(pointerId);
+            reorderData(dragNode);
+            dragNode = null;
+        }
+        dragStarted = false;
+        pointerId = null;
+    }
+
+    document.addEventListener('pointerdown', function(e){
+        const node = e.target.closest('.sortable-node');
+        if(!node) return;
+        // Do not start reordering when the user presses an edit/delete button.
+        if(e.target.closest('button,a,input,select,textarea')) return;
+        pointerId = e.pointerId;
+        pressTimer = setTimeout(() => {
+            dragNode = node;
+            dragStarted = true;
+            node.classList.add('sort-dragging');
+            try{ node.setPointerCapture(pointerId); }catch(_){}
+        }, 650);
+    });
+
+    document.addEventListener('pointermove', function(e){
+        if(!dragNode) return;
+        e.preventDefault();
+        const target = getNodeFromPoint(e.clientY);
+        if(!target) return;
+        const r = target.getBoundingClientRect();
+        if(e.clientY < r.top + r.height/2){
+            target.parentElement.insertBefore(dragNode,target);
+        }else{
+            target.parentElement.insertBefore(dragNode,target.nextSibling);
+        }
+    }, {passive:false});
+
+    document.addEventListener('pointerup', function(){ finishDrag(); });
+    document.addEventListener('pointercancel', function(){ finishDrag(); });
+
+    // Prevent the normal click after a long drag from opening the item.
+    document.addEventListener('click', function(e){
+        if(dragStarted){ e.preventDefault(); e.stopPropagation(); dragStarted=false; }
+    }, true);
+})();
 
 
 /* =========================================================
@@ -4330,17 +4500,17 @@ function renderProgressComparison(){
     const hasPrevious = !!appData.logs[previousDate];
 
     if(!hasPrevious){
-        box.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:13px">لا توجد بيانات لليوم السابق للمقارنة.</div>`;
+        box.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:13px">لا توجد بيانات للأمس للمقارنة.</div>`;
         return;
     }
 
     const difference = current.final - previous.final;
-    const status = difference > 0 ? "ارتفع عن اليوم السابق" : difference < 0 ? "انخفض عن اليوم السابق" : "بقي كما هو";
+    const status = difference > 0 ? "ارتفع عن الأمس" : difference < 0 ? "انخفض عن الأمس" : "بقي كما هو";
     const color = difference > 0 ? "var(--primary)" : difference < 0 ? "var(--danger)" : "var(--muted)";
 
     box.innerHTML = `
     <div style="display:flex;justify-content:space-between;font-weight:800;margin-bottom:8px">
-        <span>مقارنة باليوم السابق</span>
+        <span>مقارنة بالأمس</span>
         <span style="font-size:12px;color:${color}">${status}</span>
     </div>
     <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px">
