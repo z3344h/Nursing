@@ -1241,6 +1241,7 @@ let activityState = {
     categoryId:null,
     parentId:null,
     duaCategoryId:null,
+    duaParentId:null,
     duaId:null
 };
 
@@ -1502,6 +1503,18 @@ function migrateData(data){
 
     if(!Array.isArray(data.duaCategories))
         data.duaCategories = [];
+
+    // ترتيب صفحة الأعمال الرئيسية (يجمع أقسام الأعمال وأقسام الأدعية معًا).
+    const rootIds = [
+        ...data.positive.map(x => x.id),
+        ...data.duaCategories.map(x => x.id)
+    ];
+    if(!Array.isArray(data.rootOrder)) data.rootOrder = rootIds;
+    else {
+        const valid = new Set(rootIds);
+        data.rootOrder = data.rootOrder.filter(id => valid.has(id));
+        rootIds.forEach(id => { if(!data.rootOrder.includes(id)) data.rootOrder.push(id); });
+    }
 
     if(!Array.isArray(data.messages))
         data.messages = [];
@@ -2111,74 +2124,44 @@ function renderActivityRoot(container){
 */
 
 function renderExistingPositiveContent(){
+    const positiveById = new Map(appData.positive.map(x => [x.id, x]));
+    const duaById = new Map(appData.duaCategories.map(x => [x.id, x]));
+    const all = new Map([...positiveById, ...duaById]);
+    const ids = Array.isArray(appData.rootOrder)
+        ? appData.rootOrder.filter(id => all.has(id))
+        : [...appData.positive.map(x=>x.id), ...appData.duaCategories.map(x=>x.id)];
 
-    let html = "";
+    // أي عنصر قديم لم يكن موجودًا في rootOrder يضاف في النهاية دون فقد البيانات.
+    for(const node of [...appData.positive, ...appData.duaCategories]){
+        if(!ids.includes(node.id)) ids.push(node.id);
+    }
 
+    return ids.map(id => {
+        const node = all.get(id);
+        if(positiveById.has(id)) return renderPositiveRootNode(node, true);
+        return renderDuaRootNode(node);
+    }).join('');
+}
 
-    appData.positive.forEach(node => {
-
-        html += renderPositiveRootNode(node);
-
-    });
-
-
-    appData.duaCategories.forEach(category => {
-
-        html += `
-
-        <div
-        class="nav-card"
-        onclick="
-            activityState.view='duaList';
-            activityState.duaCategoryId='${category.id}';
-            renderActivities();
-        ">
-
-            <div class="nav-card-main">
-
-                <div class="nav-card-icon">
-                    📿
-                </div>
-
-                <div>
-
-                    <div class="nav-card-title">
-
-                        ${escapeHtml(category.name)}
-
-                    </div>
-
-                    <div class="nav-card-sub">
-
-                        قسم أدعية —
-                        ${
-                            (category.children || []).length
-                        }
-                        عنصر
-
-                    </div>
-
-                </div>
-
+function renderDuaRootNode(category){
+    return `
+    <div class="nav-card sortable-node"
+         data-sort-id="${category.id}"
+         data-sort-kind="root-dua-category"
+         onclick="activityState.view='duaList'; activityState.duaCategoryId='${category.id}'; activityState.duaParentId=null; renderActivities();">
+        <div class="nav-card-main">
+            <div class="nav-card-icon">📿</div>
+            <div>
+                <div class="nav-card-title">${escapeHtml(category.name)}</div>
+                <div class="nav-card-sub">قسم أدعية — ${(category.children||[]).length} عنصر</div>
             </div>
-
-            <span class="chevron">
-                ‹
-            </span>
-
         </div>
-
-        `;
-
-    });
-
-
-    return html;
-
+        <span class="chevron">‹</span>
+    </div>`;
 }
 
 
-function renderPositiveRootNode(node){
+function renderPositiveRootNode(node, sortable=false){
 
     const count =
         (node.children || []).length;
@@ -2189,7 +2172,9 @@ function renderPositiveRootNode(node){
         return `
 
         <div
-        class="nav-card"
+        class="nav-card${sortable ? " sortable-node" : ""}"
+        data-sort-id="${node.id}"
+        data-sort-kind="root-positive"
         onclick="
             activityState.view='workFolder';
             activityState.categoryId='positive';
@@ -2294,6 +2279,8 @@ function openWorkRoot(type){
         parentId:null,
 
         duaCategoryId:null,
+
+        duaParentId:null,
 
         duaId:null
 
@@ -2653,48 +2640,31 @@ function renderWorkBrowser(
 ========================================================= */
 
 function backActivity(){
-
     if(activityState.view === "duaReader"){
-
-        activityState.view = "duaList";
-
-    }
-
-    else if(activityState.view === "duaList"){
-
-        activityState.view = "duaCategories";
-
-    }
-
-    else if(activityState.view === "duaCategories"){
-
-        activityState.view = "categories";
-
-    }
-
-    else if(activityState.view === "workFolder"){
-
-        activityState.view = "workCategories";
-
-        activityState.parentId = null;
-
-    }
-
-    else if(activityState.view === "workCategories"){
-
-        activityState.view = "categories";
-
-    }
-
-    else{
-
-        activityState.view = "categories";
-
-    }
-
-
+        activityState.view="duaList";
+    }else if(activityState.view === "duaList"){
+        if(activityState.duaParentId){
+            const root=findNode(appData.duaCategories, activityState.duaCategoryId);
+            const parent=findNode(root ? (root.children||[]) : [], activityState.duaParentId);
+            const grand=findParent(root ? (root.children||[]) : [], activityState.duaParentId);
+            activityState.duaParentId = grand ? grand.id : null;
+        }else{
+            activityState.view="duaCategories";
+        }
+    }else if(activityState.view === "duaCategories"){
+        activityState.view="categories";
+    }else if(activityState.view === "workFolder"){
+        if(activityState.parentId){
+            const root=activityState.categoryId==="positive"?appData.positive:appData.negative;
+            const parent=findNode(root,activityState.parentId);
+            const grand=findParent(root,activityState.parentId);
+            activityState.parentId=grand?grand.id:null;
+            activityState.view=activityState.parentId?"workFolder":"workCategories";
+        }else activityState.view="workCategories";
+    }else if(activityState.view === "workCategories"){
+        activityState.view="categories";
+    }else activityState.view="categories";
     renderActivities();
-
 }
 
 
@@ -3063,6 +3033,11 @@ function saveNode(
 
             list.push(node);
 
+            if(type === "positive"){
+                if(!Array.isArray(appData.rootOrder)) appData.rootOrder=[];
+                appData.rootOrder.push(node.id);
+            }
+
         }
 
     }
@@ -3124,6 +3099,10 @@ function deleteNode(type,id){
         if(index >= 0)
             list.splice(index,1);
 
+        if(type === "positive" && Array.isArray(appData.rootOrder)){
+            appData.rootOrder = appData.rootOrder.filter(x => x !== id);
+        }
+
     }
 
 
@@ -3141,166 +3120,41 @@ function deleteNode(type,id){
 ========================================================= */
 
 function renderDuaCategories(container){
-
+    const list = appData.duaCategories || [];
     let html = `
+    <button class="btn back-btn" onclick="activityState.view='categories'; renderActivities();">→ رجوع</button>
+    <div class="small-title">اختاري نوع الأدعية</div>
+    <div class="action-row" style="margin-bottom:12px">
+        <button class="btn btn-primary" onclick="openDuaCategoryModal(null, null)">+ إضافة قسم</button>
+    </div>`;
 
-    <button
-    class="btn back-btn"
-    onclick="
-        activityState.view='categories';
-        renderActivities();
-    ">
-
-        → رجوع
-
-    </button>
-
-
-    <div class="small-title">
-
-        اختاري نوع الأدعية
-
-    </div>
-
-
-    <div
-    class="action-row"
-    style="margin-bottom:12px">
-
-        <button
-        class="btn btn-primary"
-        onclick="openDuaCategoryModal()">
-
-            + إضافة قسم
-
-        </button>
-
-    </div>
-
-    `;
-
-
-    if(!appData.duaCategories.length){
-
-        html += `
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                📿
-            </div>
-
-            <div>
-
-                لا توجد أقسام أدعية بعد.
-
-                <br>
-
-                يمكنك إضافة:
-
-                <br>
-
-                أدعية يومية، أسبوعية، شهرية،
-                رجب، رمضان، زيارات وغيرها.
-
-            </div>
-
-        </div>
-
-        `;
-
+    if(!list.length){
+        html += `<div class="empty"><div class="empty-icon">📿</div><div>لا توجد أقسام أدعية بعد.</div></div>`;
     }
-
-
-    appData.duaCategories.forEach(category => {
-
-        html += `
-
-        <div
-        class="nav-card"
-        onclick="
-            activityState.view='duaList';
-            activityState.duaCategoryId='${category.id}';
-            renderActivities();
-        ">
-
-            <div class="nav-card-main">
-
-                <div class="nav-card-icon">
-                    📁
-                </div>
-
-                <div>
-
-                    <div class="nav-card-title">
-
-                        ${escapeHtml(category.name)}
-
-                    </div>
-
-                    <div class="nav-card-sub">
-
-                        ${
-                            (category.children || [])
-                            .length
-                        }
-
-                        عنصر
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <button
-                class="mini"
-                onclick="
-                    event.stopPropagation();
-
-                    openDuaCategoryModal(
-                        '${category.id}'
-                    )
-                ">
-
-                    ✏️
-
-                </button>
-
-
-                <button
-                class="mini"
-                onclick="
-                    event.stopPropagation();
-
-                    deleteDuaCategory(
-                        '${category.id}'
-                    )
-                ">
-
-                    🗑️
-
-                </button>
-
-
-                <span class="chevron">
-                    ‹
-                </span>
-
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
-
+    list.forEach(category => { html += renderDuaCategoryCard(category); });
     container.innerHTML = html;
+}
 
+function renderDuaCategoryCard(category){
+    return `
+    <div class="nav-card sortable-node"
+         data-sort-id="${category.id}"
+         data-sort-kind="dua-category"
+         data-sort-parent=""
+         onclick="activityState.view='duaList'; activityState.duaCategoryId='${category.id}'; activityState.duaParentId=null; renderActivities();">
+        <div class="nav-card-main">
+            <div class="nav-card-icon">📁</div>
+            <div>
+                <div class="nav-card-title">${escapeHtml(category.name)}</div>
+                <div class="nav-card-sub">${(category.children||[]).length} عنصر</div>
+            </div>
+        </div>
+        <div>
+            <button class="mini" onclick="event.stopPropagation(); openDuaCategoryModal('${category.id}', null)">✏️</button>
+            <button class="mini" onclick="event.stopPropagation(); deleteDuaCategory('${category.id}')">🗑️</button>
+            <span class="chevron">‹</span>
+        </div>
+    </div>`;
 }
 
 
@@ -3308,7 +3162,7 @@ function renderDuaCategories(container){
    DUA CATEGORY MODAL
 ========================================================= */
 
-function openDuaCategoryModal(id=null){
+function openDuaCategoryModal(id=null, parentId=null){
 
     const existing =
         id
@@ -3358,7 +3212,8 @@ function openDuaCategoryModal(id=null){
         class="btn btn-primary"
         onclick="
             saveDuaCategory(
-                '${id || ""}'
+                '${id || ""}',
+                '${parentId || ""}'
             )
         ">
 
@@ -3385,80 +3240,36 @@ function openDuaCategoryModal(id=null){
 }
 
 
-function saveDuaCategory(id){
-
-    const name =
-        document
-        .getElementById("duaCatName")
-        .value
-        .trim();
-
-
-    if(!name){
-
-        alert("اكتبي اسم القسم");
-
-        return;
-
-    }
-
+function saveDuaCategory(id, parentId=null){
+    const name = document.getElementById("duaCatName").value.trim();
+    if(!name){ alert("اكتبي اسم القسم"); return; }
 
     if(id){
-
-        const category =
-            findNode(
-                appData.duaCategories,
-                id
-            );
-
-        category.name = name;
-
+        const category = findNode(appData.duaCategories,id);
+        if(category) category.name = name;
+    }else{
+        const category = {id:uid("duaCat"), name, type:"category", children:[]};
+        if(parentId){
+            const parent = findNode(appData.duaCategories,parentId);
+            if(!parent) return;
+            if(!Array.isArray(parent.children)) parent.children=[];
+            parent.children.push(category);
+        }else{
+            appData.duaCategories.push(category);
+            if(!Array.isArray(appData.rootOrder)) appData.rootOrder=[];
+            appData.rootOrder.push(category.id);
+        }
     }
-
-    else{
-
-        appData.duaCategories.push({
-
-            id:uid("duaCat"),
-
-            name:name,
-
-            type:"category",
-
-            children:[]
-
-        });
-
-    }
-
-
-    save();
-
-    closeModal();
-
-    renderActivities();
-
+    save(); closeModal(); renderActivities();
 }
 
-
 function deleteDuaCategory(id){
-
-    if(!confirm(
-        "حذف قسم الأدعية وكل ما بداخله؟"
-    ))
-        return;
-
-
-    appData.duaCategories =
-        appData.duaCategories.filter(
-            item => item.id !== id
-        );
-
-
-    save();
-
-    renderActivities();
-
+    if(!confirm("حذف قسم الأدعية وكل ما بداخله؟")) return;
+    const parent = findParent(appData.duaCategories,id);
+    if(parent){ parent.children = (parent.children||[]).filter(x=>x.id!==id); }
+    else { appData.duaCategories = appData.duaCategories.filter(x=>x.id!==id); }
+    if(Array.isArray(appData.rootOrder)) appData.rootOrder = appData.rootOrder.filter(x=>x!==id);
+    save(); renderActivities();
 }
 
 
@@ -3467,196 +3278,59 @@ function deleteDuaCategory(id){
 ========================================================= */
 
 function renderDuaList(container){
+    const root = findNode(appData.duaCategories, activityState.duaCategoryId);
+    if(!root){ activityState.view='duaCategories'; renderActivities(); return; }
 
-    const category =
-        findNode(
-            appData.duaCategories,
-            activityState.duaCategoryId
-        );
-
-
-    if(!category){
-
-        activityState.view =
-            "duaCategories";
-
-        renderActivities();
-
-        return;
-
-    }
-
-
-    const list =
-        category.children || [];
-
+    const parentId = activityState.duaParentId || null;
+    const parent = parentId ? findNode(root.children||[], parentId) : root;
+    if(!parent){ activityState.duaParentId=null; renderActivities(); return; }
+    const list = parent.children || [];
 
     let html = `
-
-    <button
-    class="btn back-btn"
-    onclick="
-        activityState.view='duaCategories';
-        renderActivities();
-    ">
-
-        → رجوع
-
-    </button>
-
-
-    <div class="breadcrumb">
-
-        <b>
-            ${escapeHtml(category.name)}
-        </b>
-
-    </div>
-
-
-    <div class="sort-hint"></div>
-
-    <button
-    class="btn btn-primary"
-    style="margin-bottom:12px"
-    onclick="
-        openDuaModal(
-            '${category.id}'
-        )
-    ">
-
-        + إضافة دعاء
-
-    </button>
-
-    `;
-
+    <button class="btn back-btn" onclick="backActivity()">→ رجوع</button>
+    <div class="breadcrumb"><b>${escapeHtml(parent.name)}</b></div>
+    <div class="action-row" style="margin-bottom:12px">
+        <button class="btn btn-primary" onclick="openDuaCategoryModal(null, '${parent.id}')">+ إضافة قسم أدعية</button>
+        <button class="btn" onclick="openDuaModal('${parent.id}')">+ إضافة دعاء</button>
+    </div>`;
 
     if(!list.length){
-
-        html += `
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                🤍
-            </div>
-
-            <div>
-
-                لا توجد أدعية في هذا القسم بعد.
-
-            </div>
-
-        </div>
-
-        `;
-
+        html += `<div class="empty"><div class="empty-icon">🤍</div><div>لا توجد عناصر في هذا القسم بعد.</div></div>`;
     }
 
-
-    list.forEach(dua => {
-
-        const done =
-            isDone(dua.id);
-
-
-        html += `
-
-        <div class="tree-item sortable-node"
-        data-sort-id="${dua.id}"
-        data-sort-kind="dua"
-        data-sort-category="${category.id}">
-
-            <div
-            class="work-row"
-            onclick="
-                activityState.view='duaReader';
-                activityState.duaId='${dua.id}';
-                renderActivities();
-            ">
-
-
-                <div
-                class="check
-                ${done ? "done" : ""}">
-
-                    ${done ? "✓" : ""}
-
+    list.forEach(item => {
+        const count=(item.children||[]).length;
+        if(item.type === 'category'){
+            html += `
+            <div class="nav-card sortable-node" data-sort-id="${item.id}" data-sort-kind="dua-category" data-sort-parent="${parent.id}"
+                 onclick="activityState.duaParentId='${item.id}'; renderActivities();">
+                <div class="nav-card-main"><div class="nav-card-icon">📁</div><div>
+                    <div class="nav-card-title">${escapeHtml(item.name)}</div>
+                    <div class="nav-card-sub">${count} عنصر</div>
+                </div></div>
+                <div>
+                    <button class="mini" onclick="event.stopPropagation(); openDuaCategoryModal('${item.id}', '${parent.id}')">✏️</button>
+                    <button class="mini" onclick="event.stopPropagation(); deleteDuaCategory('${item.id}')">🗑️</button>
+                    <span class="chevron">‹</span>
                 </div>
-
-
-                <div class="tree-info">
-
-                    <div class="tree-name">
-
-                        ${escapeHtml(dua.name)}
-
+            </div>`;
+        }else{
+            const done=isDone(item.id);
+            html += `
+            <div class="tree-item sortable-node" data-sort-id="${item.id}" data-sort-kind="dua" data-sort-category="${root.id}" data-sort-parent="${parent.id}">
+                <div class="work-row" onclick="activityState.view='duaReader'; activityState.duaId='${item.id}'; renderActivities();">
+                    <div class="check ${done?'done':''}">${done?'✓':''}</div>
+                    <div class="tree-info"><div class="tree-name">${escapeHtml(item.name)}</div>
+                    <div class="tree-meta">${item.text ? item.text.length.toLocaleString('ar-EG')+' حرف' : 'بدون نص بعد'}${item.linkedWorkId?' 🔗 مرتبط':''}</div></div>
+                    <div class="tree-actions">
+                        <button class="mini" onclick="event.stopPropagation(); openDuaModal('${parent.id}','${item.id}')">✏️</button>
+                        <button class="mini" onclick="event.stopPropagation(); deleteDua('${parent.id}','${item.id}')">🗑️</button>
                     </div>
-
-
-                    <div class="tree-meta">
-
-                        ${
-                            dua.text
-                            ? dua.text.length.toLocaleString("ar-EG") +
-                              " حرف"
-                            : "بدون نص بعد"
-                        }
-
-                        ${dua.linkedWorkId ? " 🔗 مرتبط" : ""}
-
-                    </div>
-
                 </div>
-
-
-                <div class="tree-actions">
-
-                    <button
-                    class="mini"
-                    onclick="
-                        event.stopPropagation();
-
-                        openDuaModal(
-                            '${category.id}',
-                            '${dua.id}'
-                        )
-                    ">
-
-                        ✏️
-
-                    </button>
-
-
-                    <button
-                    class="mini"
-                    onclick="
-                        event.stopPropagation();
-
-                        deleteDua(
-                            '${category.id}',
-                            '${dua.id}'
-                        )
-                    ">
-
-                        🗑️
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        `;
-
+            </div>`;
+        }
     });
-
-
-    container.innerHTML = html;
-
+    container.innerHTML=html;
 }
 
 
@@ -3668,7 +3342,7 @@ async function renderDuaReader(container){
     const category = findNode(appData.duaCategories, activityState.duaCategoryId);
     if(!category) return;
 
-    const dua = category.children.find(item => item.id === activityState.duaId);
+    const dua = findNode(category.children || [], activityState.duaId);
     if(!dua) return;
 
     const done = isDone(dua.id);
@@ -3742,7 +3416,10 @@ function scrollDuaToTop(){
 function goToNextDua(){
     const category = findNode(appData.duaCategories, activityState.duaCategoryId);
     if(!category) return;
-    const list = category.children || [];
+    const currentParent = activityState.duaParentId
+        ? findNode(category.children || [], activityState.duaParentId)
+        : category;
+    const list = currentParent ? (currentParent.children || []) : [];
     const index = list.findIndex(item => item.id === activityState.duaId);
     if(index < 0 || index >= list.length - 1){
         alert("هذا آخر دعاء في هذا القسم 🤍");
@@ -3777,31 +3454,39 @@ function goToNextDua(){
     }
 
     function reorderData(node){
-        const kind = node.dataset.sortKind;
-        const id = node.dataset.sortId;
+        const kind=node.dataset.sortKind, id=node.dataset.sortId;
         if(!id) return;
+        const domIds=[...node.parentElement.querySelectorAll(':scope > .sortable-node')].map(x=>x.dataset.sortId);
 
-        if(kind === "dua"){
-            const category = findNode(appData.duaCategories, node.dataset.sortCategory);
-            if(!category) return;
-            const arr = category.children || [];
-            const from = arr.findIndex(x => x.id === id);
-            if(from < 0) return;
-            const domIds = [...node.parentElement.querySelectorAll('.sortable-node')].map(x => x.dataset.sortId);
-            const ordered = domIds.map(x => arr.find(item => item.id === x)).filter(Boolean);
-            arr.splice(0, arr.length, ...ordered);
+        if(kind === 'root-positive' || kind === 'root-dua-category'){
+            const allIds=[...appData.positive.map(x=>x.id), ...appData.duaCategories.map(x=>x.id)];
+            const current=Array.isArray(appData.rootOrder)?appData.rootOrder.filter(x=>allIds.includes(x)):allIds;
+            const ordered=domIds.filter(x=>allIds.includes(x));
+            current.forEach(x=>{if(!ordered.includes(x)) ordered.push(x);});
+            appData.rootOrder=ordered; save(); return;
+        }
+
+        if(kind === 'dua' || kind === 'dua-category'){
+            const root=findNode(appData.duaCategories,node.dataset.sortKind==='dua'?node.dataset.sortCategory:node.dataset.sortId);
+            let arr=null;
+            if(root){
+                const parentId=node.dataset.sortParent||'';
+                const parent=parentId ? findNode(root.children||[],parentId) : root;
+                arr=parent ? (parent.children || (parent.children=[])) : null;
+            }
+            if(arr){
+                const ordered=domIds.map(x=>arr.find(item=>item.id===x)).filter(Boolean);
+                arr.forEach(item=>{if(!ordered.includes(item)) ordered.push(item);});
+                arr.splice(0,arr.length,...ordered);
+            }
         }else{
-            const type = node.dataset.sortType;
-            const parentId = node.dataset.sortParent || null;
-            const root = type === "positive" ? appData.positive : appData.negative;
-            const parent = parentId ? findNode(root,parentId) : null;
-            if(parent && !parent.children) parent.children=[];
-            const arr = parent ? parent.children : root;
-            const domIds = [...node.parentElement.querySelectorAll('.sortable-node')].map(x => x.dataset.sortId);
-            const ordered = domIds.map(x => arr.find(item => item.id === x)).filter(Boolean);
-            // Keep any items not represented in the current DOM at the end.
-            arr.forEach(item => { if(!ordered.includes(item)) ordered.push(item); });
-            arr.splice(0, arr.length, ...ordered);
+            const type=node.dataset.sortType, parentId=node.dataset.sortParent||null;
+            const root=type==='positive'?appData.positive:appData.negative;
+            const parent=parentId?findNode(root,parentId):null;
+            const arr=parent?(parent.children||(parent.children=[])):root;
+            const ordered=domIds.map(x=>arr.find(item=>item.id===x)).filter(Boolean);
+            arr.forEach(item=>{if(!ordered.includes(item)) ordered.push(item);});
+            arr.splice(0,arr.length,...ordered);
         }
         save();
     }
@@ -3829,7 +3514,7 @@ function goToNextDua(){
             dragStarted = true;
             node.classList.add('sort-dragging');
             try{ node.setPointerCapture(pointerId); }catch(_){}
-        }, 650);
+        }, 1000);
     });
 
     document.addEventListener('pointermove', function(e){
@@ -4056,9 +3741,7 @@ function openDuaModal(
 
     const existing =
         id
-        ? category.children.find(
-            item => item.id === id
-        )
+        ? findNode(category.children || [], id)
         : null;
 
 
@@ -4456,10 +4139,12 @@ function deleteDua(
         );
 
 
-    category.children =
-        category.children.filter(
-            item => item.id !== id
-        );
+    const parent = findParent(category.children || [], id);
+    if(parent){
+        parent.children = (parent.children || []).filter(item => item.id !== id);
+    }else{
+        category.children = (category.children || []).filter(item => item.id !== id);
+    }
 
 
     save();
@@ -5393,100 +5078,6 @@ renderHome();
 
 </script>
 
-
-<script>
-/*
- * إضافات التعديل:
- * - الضغط المطوّل يعمل أيضًا على أقسام الأدعية.
- * - لا نغيّر بنية البيانات أو بقية وظائف الموقع.
- * - عند وجود مستويات متداخلة، زر الرجوع يعود للمستوى الأب المباشر.
- */
-(function () {
-  // دعم أقسام الأدعية في خاصية الترتيب دون المساس بالترتيب الحالي.
-  const LONG_PRESS_MS = 2000;
-  let pressTimer = null;
-  let pressedEl = null;
-
-  function isSortablePrayerSection(el) {
-    if (!el || !(el instanceof HTMLElement)) return false;
-    const text = (el.textContent || "").trim();
-    // نبحث عن عناصر الأقسام التي تستخدم أسماء/خصائص شائعة في هذا المشروع.
-    return (
-      el.dataset.sortable === "true" ||
-      el.dataset.type === "prayer-section" ||
-      el.classList.contains("prayer-section") ||
-      el.classList.contains("dua-section") ||
-      el.classList.contains("category-card")
-    ) && text.length > 0;
-  }
-
-  function startLongPress(el) {
-    clearTimeout(pressTimer);
-    pressedEl = el;
-    pressTimer = setTimeout(() => {
-      if (pressedEl === el) {
-        el.classList.add("long-press-active");
-        el.dispatchEvent(new CustomEvent("sortable-longpress", {
-          bubbles: true,
-          detail: { element: el }
-        }));
-      }
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelLongPress() {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-    pressedEl = null;
-  }
-
-  document.addEventListener("pointerdown", function (e) {
-    const el = e.target.closest(
-      "[data-sortable='true'], [data-type='prayer-section'], .prayer-section, .dua-section, .category-card"
-    );
-    if (!isSortablePrayerSection(el)) return;
-    startLongPress(el);
-  }, { passive: true });
-
-  document.addEventListener("pointerup", cancelLongPress, { passive: true });
-  document.addEventListener("pointercancel", cancelLongPress, { passive: true });
-  document.addEventListener("pointermove", function (e) {
-    // لا نلغي الضغط أثناء السحب بعد تفعيله.
-    if (pressedEl && !pressedEl.classList.contains("long-press-active")) {
-      cancelLongPress();
-    }
-  }, { passive: true });
-
-  // رجوع للمستوى الأب المباشر بدل الرجوع إلى بداية القسم.
-  document.addEventListener("click", function (e) {
-    const back = e.target.closest(
-      "[data-back-parent], .back-to-parent, .back-button"
-    );
-    if (!back) return;
-
-    const parentId = back.dataset.parentId || back.dataset.backParent;
-    if (!parentId) return;
-
-    e.preventDefault();
-
-    // إذا كان المشروع يوفر دالة تنقل للمستوى، نستخدمها.
-    if (typeof window.openCategory === "function") {
-      window.openCategory(parentId);
-      return;
-    }
-    if (typeof window.openSection === "function") {
-      window.openSection(parentId);
-      return;
-    }
-
-    // fallback: النقر على عنصر الأب إن كان موجودًا في DOM.
-    const parent = document.querySelector(
-      `[data-id="${CSS.escape(parentId)}"], [data-category-id="${CSS.escape(parentId)}"]`
-    );
-    if (parent) parent.click();
-  });
-})();
-</script>
 
 </body>
 </html>
