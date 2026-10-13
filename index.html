@@ -2525,14 +2525,15 @@ function renderWorkBrowser(
 
                 <div
                 class="work-row"
-                onclick="
-                    toggleWork('${node.id}')
-                ">
+                onclick="handleWorkRowClick('${node.id}')">
 
 
                     <div
                     class="check
-                    ${done ? "done" : ""}">
+                    ${done ? "done" : ""}"
+                    role="button"
+                    aria-label="تحديد إنجاز العمل"
+                    onclick="event.stopPropagation(); toggleWork('${node.id}')">
 
                         ${done ? "✓" : ""}
 
@@ -2671,6 +2672,44 @@ function backActivity(){
 /* =========================================================
    WORK TOGGLE + DUA LINK
 ========================================================= */
+
+function findDuaContext(duaId){
+    function walk(nodes, rootId, parentId=null){
+        for(const node of (nodes || [])){
+            if(node.id === duaId && node.type === "dua"){
+                return { rootId, parentId, duaId: node.id };
+            }
+            if(node.children && node.children.length){
+                const found = walk(node.children, rootId || (node.type === "category" ? node.id : null), node.id);
+                if(found) return found;
+            }
+        }
+        return null;
+    }
+    for(const category of (appData.duaCategories || [])){
+        if(category.id === duaId && category.type === "dua") return {rootId:category.id,parentId:null,duaId};
+        const found = walk(category.children || [], category.id, null);
+        if(found) return found;
+    }
+    return null;
+}
+
+function handleWorkRowClick(id){
+    const work = findNode(appData.positive, id) || findNode(appData.negative, id);
+    if(work && work.linkedDuaId){
+        const context = findDuaContext(work.linkedDuaId);
+        if(context){
+            activityState.view = "duaReader";
+            activityState.duaCategoryId = context.rootId;
+            activityState.duaParentId = context.parentId;
+            activityState.duaId = context.duaId;
+            renderActivities();
+            return;
+        }
+    }
+    // Keep the existing behavior for work items without a linked dua.
+    toggleWork(id);
+}
 
 function toggleWork(id){
 
