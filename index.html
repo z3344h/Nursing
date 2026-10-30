@@ -463,16 +463,54 @@ label{
 
 .bottom-nav{
     position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:var(--surface);
-    border-top:1px solid var(--border);
+    bottom:max(9px, env(safe-area-inset-bottom));
+    left:12px;
+    right:12px;
+    background:rgba(255,255,255,.48);
+    border:1px solid rgba(255,255,255,.68);
+    border-radius:24px;
     display:flex;
     justify-content:space-around;
-    padding:9px 0 18px;
+    align-items:center;
+    padding:10px 3px 11px;
     z-index:50;
-    box-shadow:0 -3px 12px rgba(0,0,0,.05);
+    box-shadow:0 8px 28px rgba(31,41,55,.13), inset 0 1px 0 rgba(255,255,255,.72);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);
+    backdrop-filter:blur(24px) saturate(180%);
+    overflow:hidden;
+}
+
+.bottom-nav::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.06) 48%,rgba(255,255,255,.18));
+}
+
+.bottom-nav .nav-item{
+    position:relative;
+    z-index:1;
+    min-width:0;
+    flex:1;
+    padding:2px 0;
+    transition:color .2s ease, transform .2s ease;
+}
+
+.bottom-nav .nav-item.active{
+    color:var(--primary);
+    text-shadow:0 0 12px rgba(200,138,154,.22);
+}
+
+.dark .bottom-nav{
+    background:rgba(25,35,53,.58);
+    border-color:rgba(255,255,255,.13);
+    box-shadow:0 8px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+.dark .bottom-nav::before{
+    background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.015) 48%,rgba(255,255,255,.06));
 }
 
 .nav-item{
@@ -634,6 +672,134 @@ label{
 .long-press-active {
   touch-action: none;
   user-select: none;
+}
+</style>
+
+
+
+<style id="ios-visual-refresh">
+/* iOS-inspired visual layer only: no markup, data, or behavior changes */
+:root{
+  --ios-glass:rgba(255,255,255,.62);
+  --ios-glass-border:rgba(255,255,255,.72);
+  --ios-highlight:rgba(255,255,255,.78);
+  --ios-radius:20px;
+}
+.dark{
+  --ios-glass:rgba(30,41,59,.66);
+  --ios-glass-border:rgba(255,255,255,.14);
+  --ios-highlight:rgba(255,255,255,.12);
+}
+html{ -webkit-tap-highlight-color:transparent; scroll-behavior:smooth; }
+body{
+  padding-bottom:calc(100px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(200,138,154,.10), transparent 42%),
+    var(--bg);
+}
+.container{padding-top:max(16px, env(safe-area-inset-top));}
+header{padding:5px 2px 12px;}
+h1{letter-spacing:-.35px;}
+.card,.comparison-box,.stat-box,.chart-container,.tree-item,.nav-card,.msg-card{
+  border-radius:20px;
+  border-color:color-mix(in srgb, var(--border) 72%, transparent);
+  box-shadow:0 5px 18px rgba(31,41,55,.055), inset 0 1px 0 rgba(255,255,255,.34);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.dark .card,.dark .comparison-box,.dark .stat-box,.dark .chart-container,
+.dark .tree-item,.dark .nav-card,.dark .msg-card{
+  box-shadow:0 7px 22px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.035);
+}
+.nav-card{padding:16px;border-radius:19px;}
+.nav-card:active,.card:active,.btn:active,.btn-icon:active,.mini:active{
+  transform:scale(.975);
+}
+.btn,.btn-icon{
+  border-radius:14px;
+  min-height:40px;
+  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+.btn-primary{
+  box-shadow:0 5px 13px rgba(200,138,154,.22), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.btn-danger{box-shadow:0 4px 12px rgba(239,68,68,.14);}
+.btn-light{border-color:transparent;}
+/* Native-looking back controls */
+.back-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:42px;
+  padding:9px 15px;
+  border-radius:15px;
+  background:var(--ios-glass);
+  border:1px solid var(--ios-glass-border);
+  -webkit-backdrop-filter:blur(18px) saturate(175%);
+  backdrop-filter:blur(18px) saturate(175%);
+  box-shadow:0 4px 14px rgba(31,41,55,.07), inset 0 1px 0 var(--ios-highlight);
+  color:var(--primary);
+  font-weight:800;
+}
+.dark .back-btn{box-shadow:0 4px 14px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.08);}
+input,textarea,select{
+  border-radius:14px;
+  min-height:43px;
+  border-color:color-mix(in srgb, var(--border) 78%, transparent);
+  box-shadow:inset 0 1px 2px rgba(15,23,42,.025);
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(200,138,154,.15);
+}
+.check{border-radius:8px;}
+.modal-overlay{
+  background:rgba(15,23,42,.34);
+  -webkit-backdrop-filter:blur(7px);
+  backdrop-filter:blur(7px);
+}
+.modal{
+  border:1px solid var(--ios-glass-border);
+  border-radius:25px;
+  box-shadow:0 22px 60px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.bottom-nav{
+  bottom:max(10px, env(safe-area-inset-bottom));
+  padding:11px 5px 12px;
+  border-radius:27px;
+  background:var(--ios-glass);
+  border-color:var(--ios-glass-border);
+  -webkit-backdrop-filter:blur(28px) saturate(190%);
+  backdrop-filter:blur(28px) saturate(190%);
+}
+.bottom-nav .nav-item{border-radius:17px;}
+.bottom-nav .nav-item.active{
+  transform:translateY(-1px);
+  font-weight:800;
+}
+.bottom-nav .nav-item.active .nav-icon{
+  filter:drop-shadow(0 2px 5px rgba(200,138,154,.28));
+}
+.nav-icon{font-size:21px;}
+.dua-top-btn{
+  background:var(--ios-glass);
+  border:1px solid var(--ios-glass-border);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  backdrop-filter:blur(18px) saturate(180%);
+  box-shadow:0 7px 20px rgba(31,41,55,.12),inset 0 1px 0 var(--ios-highlight);
+}
+@media(max-width:600px){
+  .modal-overlay{align-items:flex-end;padding:8px;}
+  .modal{
+    max-height: min(88vh, 760px);
+    border-radius:26px 26px 18px 18px;
+    padding:21px 18px calc(18px + env(safe-area-inset-bottom));
+  }
+  .container{padding-left:13px;padding-right:13px;}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;}
 }
 </style>
 
@@ -2525,15 +2691,14 @@ function renderWorkBrowser(
 
                 <div
                 class="work-row"
-                onclick="handleWorkRowClick('${node.id}')">
+                onclick="
+                    toggleWork('${node.id}')
+                ">
 
 
                     <div
                     class="check
-                    ${done ? "done" : ""}"
-                    role="button"
-                    aria-label="تحديد إنجاز العمل"
-                    onclick="event.stopPropagation(); toggleWork('${node.id}')">
+                    ${done ? "done" : ""}">
 
                         ${done ? "✓" : ""}
 
@@ -2672,44 +2837,6 @@ function backActivity(){
 /* =========================================================
    WORK TOGGLE + DUA LINK
 ========================================================= */
-
-function findDuaContext(duaId){
-    function walk(nodes, rootId, parentId=null){
-        for(const node of (nodes || [])){
-            if(node.id === duaId && node.type === "dua"){
-                return { rootId, parentId, duaId: node.id };
-            }
-            if(node.children && node.children.length){
-                const found = walk(node.children, rootId || (node.type === "category" ? node.id : null), node.id);
-                if(found) return found;
-            }
-        }
-        return null;
-    }
-    for(const category of (appData.duaCategories || [])){
-        if(category.id === duaId && category.type === "dua") return {rootId:category.id,parentId:null,duaId};
-        const found = walk(category.children || [], category.id, null);
-        if(found) return found;
-    }
-    return null;
-}
-
-function handleWorkRowClick(id){
-    const work = findNode(appData.positive, id) || findNode(appData.negative, id);
-    if(work && work.linkedDuaId){
-        const context = findDuaContext(work.linkedDuaId);
-        if(context){
-            activityState.view = "duaReader";
-            activityState.duaCategoryId = context.rootId;
-            activityState.duaParentId = context.parentId;
-            activityState.duaId = context.duaId;
-            renderActivities();
-            return;
-        }
-    }
-    // Keep the existing behavior for work items without a linked dua.
-    toggleWork(id);
-}
 
 function toggleWork(id){
 
