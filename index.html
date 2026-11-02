@@ -480,6 +480,19 @@ label{
     overflow:hidden;
 }
 
+.bottom-nav{position:fixed;}
+.bottom-nav .nav-indicator{
+    position:absolute; z-index:0; top:5px; bottom:5px; left:0; width:20%;
+    border-radius:999px; pointer-events:none;
+    background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(255,255,255,.42));
+    border:1px solid rgba(255,255,255,.82);
+    box-shadow:0 5px 18px rgba(45,55,75,.13),inset 0 1px 2px rgba(255,255,255,.95),inset 0 -1px 2px rgba(130,145,170,.12);
+    -webkit-backdrop-filter:blur(24px) saturate(190%); backdrop-filter:blur(24px) saturate(190%);
+    transform:translateX(0); transition:transform .42s cubic-bezier(.22,1,.36,1),width .42s cubic-bezier(.22,1,.36,1);
+}
+.dark .bottom-nav .nav-indicator{background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.09));border-color:rgba(255,255,255,.24);box-shadow:0 5px 18px rgba(0,0,0,.24),inset 0 1px 2px rgba(255,255,255,.2);}
+.bottom-nav .nav-item{z-index:1;}
+.bottom-nav .nav-item.active{transform:none;text-shadow:none;}
 .bottom-nav::before{
     content:"";
     position:absolute;
@@ -1301,6 +1314,7 @@ style="text-align:center;margin-top:7px">
 ========================= -->
 
 <nav class="bottom-nav">
+<div class="nav-indicator" aria-hidden="true"></div>
 
 <div
 class="nav-item active"
@@ -1896,6 +1910,18 @@ function totals(date=today()){
    NAVIGATION
 ========================================================= */
 
+function updateBottomNavIndicator(){
+    const nav=document.querySelector('.bottom-nav');
+    if(!nav) return;
+    let indicator=nav.querySelector('.nav-indicator');
+    if(!indicator){ indicator=document.createElement('div'); indicator.className='nav-indicator'; nav.prepend(indicator); }
+    const active=nav.querySelector('.nav-item.active');
+    if(!active) return;
+    const nr=nav.getBoundingClientRect(), ar=active.getBoundingClientRect();
+    indicator.style.width=ar.width+'px';
+    indicator.style.transform=`translateX(${ar.left-nr.left}px)`;
+}
+
 function navigateTo(page,element){
 
     document
@@ -1937,6 +1963,8 @@ function navigateTo(page,element){
 
 }
 
+
+window.addEventListener("resize", () => requestAnimationFrame(updateBottomNavIndicator));
 
 /* =========================================================
    HOME
@@ -2689,23 +2717,21 @@ function renderWorkBrowser(
             data-sort-type="${type}"
             data-sort-parent="${parentId || ""}">
 
-                <div
-                class="work-row"
-                onclick="
-                    toggleWork('${node.id}')
-                ">
+                <div class="work-row">
 
 
                     <div
-                    class="check
-                    ${done ? "done" : ""}">
+                    class="check ${done ? "done" : ""}"
+                    role="button" tabindex="0" aria-label="تحديد إنجاز العمل"
+                    onclick="event.stopPropagation();toggleWork('${node.id}')"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleWork('${node.id}');}">
 
                         ${done ? "✓" : ""}
 
                     </div>
 
 
-                    <div class="tree-info">
+                    <div class="tree-info" style="cursor:pointer" onclick="event.stopPropagation();${node.linkedDuaId ? `openLinkedDuaFromWork('${node.id}')` : `toggleWork('${node.id}')`}">
 
                         <div
                         class="tree-name"
@@ -2833,6 +2859,35 @@ function backActivity(){
     renderActivities();
 }
 
+
+function findDuaLocation(duaId){
+    for(const root of appData.duaCategories || []){
+        function walk(items,parentId=null){
+            for(const item of items || []){
+                if(item.id===duaId && item.type==='dua') return {root,parentId,dua:item};
+                const found=walk(item.children || [], item.id);
+                if(found) return found;
+            }
+            return null;
+        }
+        const found=walk(root.children || [], null);
+        if(found) return found;
+    }
+    return null;
+}
+
+function openLinkedDuaFromWork(workId){
+    const work=findNode(appData.positive,workId) || findNode(appData.negative,workId);
+    if(!work || !work.linkedDuaId) return;
+    const found=findDuaLocation(work.linkedDuaId);
+    if(!found){ alert('الدعاء المرتبط بهذا العمل غير موجود حالياً.'); return; }
+    activityState.view='duaReader';
+    activityState.duaCategoryId=found.root.id;
+    activityState.duaParentId=found.parentId;
+    activityState.duaId=found.dua.id;
+    renderActivities();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
 
 /* =========================================================
    WORK TOGGLE + DUA LINK
@@ -3468,7 +3523,7 @@ function renderDuaList(container){
         const count=(item.children||[]).length;
         if(item.type === 'category'){
             html += `
-            <div class="nav-card sortable-node" data-sort-id="${item.id}" data-sort-kind="dua-category" data-sort-parent="${parent.id}"
+            <div class="nav-card sortable-node" data-sort-id="${item.id}" data-sort-kind="dua-category" data-sort-category="${root.id}" data-sort-parent="${parent.id}"
                  onclick="activityState.duaParentId='${item.id}'; renderActivities();">
                 <div class="nav-card-main"><div class="nav-card-icon">📁</div><div>
                     <div class="nav-card-title">${escapeHtml(item.name)}</div>
@@ -3549,7 +3604,7 @@ async function renderDuaReader(container){
 
         ${attachmentHtml}
 
-        <div class="reader-done" onclick="toggleDua('${dua.id}')">
+        <div class="reader-done" role="button" tabindex="0" onclick="markDuaReadAndNext('${dua.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();markDuaReadAndNext('${dua.id}');}">
             <div class="check ${done ? "done" : ""}">${done ? "✓" : ""}</div>
             <b>${done ? "تم إتمام القراءة" : "إتمام القراءة"}</b>
         </div>
@@ -3633,7 +3688,7 @@ function goToNextDua(){
         }
 
         if(kind === 'dua' || kind === 'dua-category'){
-            const root=findNode(appData.duaCategories,node.dataset.sortKind==='dua'?node.dataset.sortCategory:node.dataset.sortId);
+            const root=findNode(appData.duaCategories,node.dataset.sortCategory || node.dataset.sortId);
             let arr=null;
             if(root){
                 const parentId=node.dataset.sortParent||'';
@@ -3749,6 +3804,22 @@ function toggleDua(id){
 
 }
 
+
+function markDuaReadAndNext(id){
+    const dua=allDuas().find(item=>item.id===id);
+    if(!dua) return;
+    setDone(id,true);
+    if(dua.linkedWorkId) getLog(editingDate).completed[dua.linkedWorkId]=true;
+    save();
+    const root=findNode(appData.duaCategories,activityState.duaCategoryId);
+    const parent=activityState.duaParentId ? findNode(root ? (root.children||[]) : [],activityState.duaParentId) : root;
+    const siblings=parent ? (parent.children||[]) : [];
+    const index=siblings.findIndex(item=>item.id===id);
+    const next=siblings.slice(index+1).find(item=>item.type==='dua');
+    if(next){ activityState.duaId=next.id; renderActivities(); window.scrollTo({top:0,behavior:'smooth'}); }
+    else { renderActivities(); alert('تمت قراءة الدعاء 🤍 هذا آخر دعاء في هذا القسم.'); }
+    renderHome();
+}
 
 /* =========================================================
    DUA MODAL
@@ -5241,6 +5312,7 @@ if(
 
 
 renderHome();
+requestAnimationFrame(updateBottomNavIndicator);
 
 </script>
 
